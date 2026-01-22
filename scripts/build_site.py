@@ -11,9 +11,12 @@ OUT_FILE = OUT_DIR / "index.html"
 def main():
     df = pd.read_excel(ROOT / "data" / "league_results.xlsx", sheet_name="Sheet1")
 
-    display_cols = ["Rank", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
+    # Add playoff indicators
+    df['Playoff'] = df['Rank'].apply(lambda x: '🏆' if x == 1 else '⭐' if x <= 8 else '')
+    
+    display_cols = ["Rank", "Playoff", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
-    table_html = df[display_cols].sort_values("Rank").to_html(index=False)
+    table_html = df[display_cols].sort_values("Rank").to_html(index=False, escape=False)
     
     # Create bar chart for Total Points by Team
     chart_df = df.sort_values("Total Points", ascending=False)
@@ -61,17 +64,16 @@ def main():
                 y=gw_score_col,
                 title=f'Gameweek {most_recent_week} Results',
                 labels={gw_score_col: 'Score', 'Team Name': 'Team Name'},
-                text=gw_score_col,
-                color=gw_result_col,
-                color_discrete_map=color_map
+                text=gw_score_col
             )
-            gw_fig.update_traces(textposition='outside')
+            # Apply custom colors to preserve sort order
+            gw_fig.update_traces(marker_color=colors, textposition='outside')
             gw_fig.update_layout(
                 xaxis_tickangle=-45,
                 height=500,
                 margin=dict(b=100),
                 font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"),
-                showlegend=True
+                showlegend=False
             )
             gw_chart_html = pio.to_html(gw_fig, include_plotlyjs='cdn', div_id="gameweek-chart")
         else:
@@ -84,7 +86,7 @@ def main():
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>My Data MVP</title>
+  <title>Farmer's League Football V</title>
   <style>
     body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }}
     .card {{ border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; margin: 16px 0; }}
