@@ -45,8 +45,8 @@ def main():
     fig.update_traces(textposition='outside')
     fig.update_layout(
         xaxis_tickangle=-45,
-        height=500,
-        margin=dict(b=100),
+        height=600,
+        margin=dict(b=100, t=80),
         font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif")
     )
     chart_html = pio.to_html(fig, include_plotlyjs='cdn', div_id="points-chart")
@@ -84,8 +84,8 @@ def main():
             gw_fig.update_traces(marker_color=colors, textposition='outside')
             gw_fig.update_layout(
                 xaxis_tickangle=-45,
-                height=500,
-                margin=dict(b=100),
+                height=600,
+                margin=dict(b=100, t=80),
                 font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"),
                 showlegend=False
             )
@@ -107,11 +107,11 @@ def main():
       max-width: 900px; 
       margin: 40px auto; 
       padding: 0 16px;
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #faf7ff 100%);
+      background: linear-gradient(135deg, #2d1b69 0%, #3A083F 50%, #1f0a2e 100%);
       min-height: 100vh;
     }}
     h1 {{
-      color: #3A083F;
+      color: #ffffff;
       text-align: center;
       font-weight: 700;
       font-size: 2.5rem;
@@ -119,7 +119,7 @@ def main():
       text-shadow: 0 2px 4px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 1rem;
     }}
     .logo {{
@@ -139,21 +139,47 @@ def main():
       color: #3A083F;
       margin-top: 0;
       margin-bottom: 1rem;
-      font-weight: 600;
+      font-weight: bold;
     }}
     table {{ 
-      border-collapse: collapse; 
+      border-collapse: separate; 
       width: 100%; 
       background: white;
       border-radius: 12px;
-      overflow: hidden;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      max-height: 400px;
+      overflow-y: auto;
+      display: block;
+    }}
+    table thead, table tbody {{
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }}
+    table thead {{
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #3A083F, #2d0631);
+      z-index: 10;
     }}
     th, td {{ 
       border-bottom: 1px solid #e5e7eb; 
-      text-align: left; 
+      text-align: center; 
       padding: 8px 12px;
       font-size: 0.95rem;
+      width: 8%;
+    }}
+    th:nth-child(3), td:nth-child(3) {{
+      width: 25%;
+      text-align: left;
+    }}
+    th:first-child, td:first-child {{
+      text-align: center;
+      width: 6%;
+    }}
+    th:nth-child(2), td:nth-child(2) {{
+      text-align: center;
+      width: 6%;
     }}
     th {{ 
       background: linear-gradient(135deg, #3A083F, #2d0631);
@@ -174,42 +200,63 @@ def main():
     }}
     .kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }}
     .kpi {{ border: 1px solid #d8b4fe; border-radius: 14px; padding: 12px; background: rgba(255, 255, 255, 0.8); }}
+    .kpi h3 {{
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3A083F;
+      margin: 0 0 0.5rem 0;
+      text-align: center;
+    }}
+    .kpi p {{
+      font-size: 1rem;
+      font-weight: normal;
+      color: #000;
+      margin: 0;
+      text-align: center;
+    }}
     .muted {{ color: #6b7280; text-align: center; margin-top: 2rem; }}
+    .large-title {{
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3A083F;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }}
   </style>
 </head>
 <body>
   <h1>
-    <img src="data/logo.PNG" alt="League Logo" class="logo">
+    <img src="logo.PNG" alt="League Logo" class="logo">
     Farmer's Football League 2025-2026
   </h1>
 
   <div class="kpis">
     <div class="kpi">
       <h3>League Leader</h3>
-      <p style="font-size: 1.5rem; font-weight: bold; color: #3A083F; margin: 0;">{league_leader}</p>
+      <p>{league_leader}</p>
     </div>
     <div class="kpi">
       <h3>Last MoTM Champ</h3>
-      <p style="font-size: 1.5rem; font-weight: bold; color: #3A083F; margin: 0;">{last_motm_champ}</p>
+      <p>{last_motm_champ}</p>
     </div>
     <div class="kpi">
       <h3>Current MoTM Leader</h3>
-      <p style="font-size: 1.5rem; font-weight: bold; color: #3A083F; margin: 0;">{current_motm}</p>
+      <p>{current_motm}</p>
     </div>
   </div>
 
   <div class="card">
-    <h2>League Standings</h2>
+    <h2 class="large-title">League Standings</h2>
     {table_html}
   </div>
 
   <div class="card">
-    <h2>Total Points by Team</h2>
+    <h2 class="large-title">Total Points by Team</h2>
     {chart_html}
   </div>
 
   <div class="card">
-    <h2>Latest Gameweek Results</h2>
+    <h2 class="large-title">Latest Gameweek Results</h2>
     {gw_chart_html}
   </div>
 
