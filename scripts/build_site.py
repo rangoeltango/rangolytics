@@ -32,13 +32,6 @@ def main():
 </head>
 <body>
   <h1>My Data MVP</h1>
-  <p class="muted">Auto-published with GitHub Actions + Pages.</p>
-
-  <div class="kpis">
-    <div class="kpi"><div class="muted">Latest date</div><div><b>{latest_date}</b></div></div>
-    <div class="kpi"><div class="muted">Total value</div><div><b>{total:.0f}</b></div></div>
-    <div class="kpi"><div class="muted">Average value</div><div><b>{avg:.2f}</b></div></div>
-  </div>
 
   <div class="card">
     <h2>Latest rows</h2>
