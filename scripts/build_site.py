@@ -88,14 +88,71 @@ def main():
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Farmer's League Football V</title>
   <style>
-    body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }}
-    .card {{ border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; margin: 16px 0; }}
-    table {{ border-collapse: collapse; width: 100%; }}
-    th, td {{ border-bottom: 1px solid #eee; text-align: left; padding: 10px; }}
-    th {{ background: #fafafa; }}
+    body {{ 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
+      max-width: 900px; 
+      margin: 40px auto; 
+      padding: 0 16px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+      min-height: 100vh;
+    }}
+    h1 {{
+      color: #065f46;
+      text-align: center;
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }}
+    .card {{ 
+      border: 1px solid #d1fae5; 
+      border-radius: 16px; 
+      padding: 20px; 
+      margin: 20px 0; 
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }}
+    .card h2 {{
+      color: #047857;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }}
+    table {{ 
+      border-collapse: collapse; 
+      width: 100%; 
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }}
+    th, td {{ 
+      border-bottom: 1px solid #e5e7eb; 
+      text-align: left; 
+      padding: 8px 12px;
+      font-size: 0.95rem;
+    }}
+    th {{ 
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+    }}
+    td {{
+      background: white;
+    }}
+    tr:nth-child(even) td {{
+      background: #f9fafb;
+    }}
+    tr:hover td {{
+      background: #f0fdf4;
+    }}
     .kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }}
-    .kpi {{ border: 1px solid #e5e7eb; border-radius: 14px; padding: 12px; }}
-    .muted {{ color: #6b7280; }}
+    .kpi {{ border: 1px solid #d1fae5; border-radius: 14px; padding: 12px; background: rgba(255, 255, 255, 0.8); }}
+    .muted {{ color: #6b7280; text-align: center; margin-top: 2rem; }}
   </style>
 </head>
 <body>
