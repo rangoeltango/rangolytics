@@ -14,6 +14,19 @@ def main():
     # Add playoff indicators
     df['Playoff'] = df['Rank'].apply(lambda x: '🏆' if x == 1 else '⭐' if x <= 8 else '')
     
+    # Get metrics for cards
+    league_leader = df.loc[df['Rank'] == 1, 'Team Name'].iloc[0]
+    
+    # Last MoTM Champion
+    last_motm_champ = "Gabi-Gabi-Gabagool"
+    
+    # Current MoTM Leader (MoTM 7 - highest points, then highest score for ties)
+    current_motm = "TBD"
+    if 'MoTM 7 Points' in df.columns and 'MoTM 7 Score' in df.columns:
+        # Sort by MoTM 7 Points (descending), then by MoTM 7 Score (descending) for tiebreaker
+        motm_sorted = df.sort_values(['MoTM 7 Points', 'MoTM 7 Score'], ascending=[False, False])
+        current_motm = motm_sorted.iloc[0]['Team Name']
+    
     display_cols = ["Rank", "Playoff", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
     table_html = df[display_cols].sort_values("Rank").to_html(index=False, escape=False)
@@ -26,7 +39,8 @@ def main():
         y="Total Points",
         title="Total Points by Team",
         labels={"Total Points": "Total Points", "Team Name": "Team Name"},
-        text="Total Points"
+        text="Total Points",
+        color_discrete_sequence=["#3A083F"]
     )
     fig.update_traces(textposition='outside')
     fig.update_layout(
@@ -93,19 +107,27 @@ def main():
       max-width: 900px; 
       margin: 40px auto; 
       padding: 0 16px;
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #faf7ff 100%);
       min-height: 100vh;
     }}
     h1 {{
-      color: #065f46;
+      color: #3A083F;
       text-align: center;
       font-weight: 700;
       font-size: 2.5rem;
       margin-bottom: 2rem;
       text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }}
+    .logo {{
+      height: 60px;
+      width: auto;
     }}
     .card {{ 
-      border: 1px solid #d1fae5; 
+      border: 1px solid #d8b4fe; 
       border-radius: 16px; 
       padding: 20px; 
       margin: 20px 0; 
@@ -114,7 +136,7 @@ def main():
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
     }}
     .card h2 {{
-      color: #047857;
+      color: #3A083F;
       margin-top: 0;
       margin-bottom: 1rem;
       font-weight: 600;
@@ -134,7 +156,7 @@ def main():
       font-size: 0.95rem;
     }}
     th {{ 
-      background: linear-gradient(135deg, #10b981, #059669);
+      background: linear-gradient(135deg, #3A083F, #2d0631);
       color: white;
       font-weight: 600;
       text-transform: uppercase;
@@ -148,15 +170,33 @@ def main():
       background: #f9fafb;
     }}
     tr:hover td {{
-      background: #f0fdf4;
+      background: #faf7ff;
     }}
     .kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }}
-    .kpi {{ border: 1px solid #d1fae5; border-radius: 14px; padding: 12px; background: rgba(255, 255, 255, 0.8); }}
+    .kpi {{ border: 1px solid #d8b4fe; border-radius: 14px; padding: 12px; background: rgba(255, 255, 255, 0.8); }}
     .muted {{ color: #6b7280; text-align: center; margin-top: 2rem; }}
   </style>
 </head>
 <body>
-  <h1>Farmer's Football League 2025-2026</h1>
+  <h1>
+    <img src="data/logo.PNG" alt="League Logo" class="logo">
+    Farmer's Football League 2025-2026
+  </h1>
+
+  <div class="kpis">
+    <div class="kpi">
+      <h3>League Leader</h3>
+      <p style="font-size: 1.5rem; font-weight: bold; color: #3A083F; margin: 0;">{league_leader}</p>
+    </div>
+    <div class="kpi">
+      <h3>Last MoTM Champ</h3>
+      <p style="font-size: 1.5rem; font-weight: bold; color: #3A083F; margin: 0;">{last_motm_champ}</p>
+    </div>
+    <div class="kpi">
+      <h3>Current MoTM Leader</h3>
+      <p style="font-size: 1.5rem; font-weight: bold; color: #3A083F; margin: 0;">{current_motm}</p>
+    </div>
+  </div>
 
   <div class="card">
     <h2>League Standings</h2>
