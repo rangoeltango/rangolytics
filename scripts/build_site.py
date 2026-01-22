@@ -1,5 +1,7 @@
 from pathlib import Path
 import pandas as pd
+import plotly.express as px
+import plotly.io as pio
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "sample.csv"
@@ -9,9 +11,26 @@ OUT_FILE = OUT_DIR / "index.html"
 def main():
     df = pd.read_excel(ROOT / "data" / "league_results.xlsx", sheet_name="Sheet1")
 
-    display_cols = ["Rank", "Team Name", "Owner Name", "W", "D", "L", "Total Score", "Total Points", "Total FFPts"]
+    display_cols = ["Rank", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
     table_html = df[display_cols].sort_values("Rank").to_html(index=False)
+    
+    # Create bar chart for Total Points by Team
+    chart_df = df.sort_values("Total Points", ascending=False)
+    fig = px.bar(
+        chart_df, 
+        x="Team Name", 
+        y="Total Points",
+        title="Total Points by Team",
+        labels={"Total Points": "Total Points", "Team Name": "Team Name"}
+    )
+    fig.update_layout(
+        xaxis_tickangle=-45,
+        height=500,
+        margin=dict(b=100),
+        font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif")
+    )
+    chart_html = pio.to_html(fig, include_plotlyjs='cdn', div_id="points-chart")
 
     html = f"""<!doctype html>
 <html lang="en">
@@ -31,11 +50,16 @@ def main():
   </style>
 </head>
 <body>
-  <h1>My Data MVP</h1>
+  <h1>Farmer's Football League 2025-2026</h1>
 
   <div class="card">
-    <h2>Latest rows</h2>
+    <h2>League Standings</h2>
     {table_html}
+  </div>
+
+  <div class="card">
+    <h2>Total Points by Team</h2>
+    {chart_html}
   </div>
 
   <div class="muted">
