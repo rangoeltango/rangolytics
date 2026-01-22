@@ -22,8 +22,10 @@ def main():
         x="Team Name", 
         y="Total Points",
         title="Total Points by Team",
-        labels={"Total Points": "Total Points", "Team Name": "Team Name"}
+        labels={"Total Points": "Total Points", "Team Name": "Team Name"},
+        text="Total Points"
     )
+    fig.update_traces(textposition='outside')
     fig.update_layout(
         xaxis_tickangle=-45,
         height=500,
@@ -31,6 +33,51 @@ def main():
         font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif")
     )
     chart_html = pio.to_html(fig, include_plotlyjs='cdn', div_id="points-chart")
+    
+    # Find most recent week with data
+    score_cols = [col for col in df.columns if col.startswith('Wk ') and col.endswith(' Score')]
+    most_recent_week = 0
+    for col in score_cols:
+        week_num = int(col.split()[1])
+        if not df[col].isna().all() and df[col].sum() > 0:  # Has actual scores
+            most_recent_week = max(most_recent_week, week_num)
+    
+    # Create gameweek results chart
+    if most_recent_week > 0:
+        gw_score_col = f'Wk {most_recent_week} Score'
+        gw_result_col = f'Wk {most_recent_week} Result'
+        
+        if gw_score_col in df.columns and gw_result_col in df.columns:
+            gw_df = df[[gw_score_col, gw_result_col, 'Team Name']].copy()
+            gw_df = gw_df.sort_values(gw_score_col, ascending=False)
+            
+            # Color mapping for results
+            color_map = {'W': 'green', 'L': 'red', 'D': 'gold'}
+            colors = [color_map.get(result, 'blue') for result in gw_df[gw_result_col]]
+            
+            gw_fig = px.bar(
+                gw_df,
+                x='Team Name',
+                y=gw_score_col,
+                title=f'Gameweek {most_recent_week} Results',
+                labels={gw_score_col: 'Score', 'Team Name': 'Team Name'},
+                text=gw_score_col,
+                color=gw_result_col,
+                color_discrete_map=color_map
+            )
+            gw_fig.update_traces(textposition='outside')
+            gw_fig.update_layout(
+                xaxis_tickangle=-45,
+                height=500,
+                margin=dict(b=100),
+                font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"),
+                showlegend=True
+            )
+            gw_chart_html = pio.to_html(gw_fig, include_plotlyjs='cdn', div_id="gameweek-chart")
+        else:
+            gw_chart_html = "<p>No gameweek data available</p>"
+    else:
+        gw_chart_html = "<p>No gameweek data available</p>"
 
     html = f"""<!doctype html>
 <html lang="en">
@@ -60,6 +107,11 @@ def main():
   <div class="card">
     <h2>Total Points by Team</h2>
     {chart_html}
+  </div>
+
+  <div class="card">
+    <h2>Latest Gameweek Results</h2>
+    {gw_chart_html}
   </div>
 
   <div class="muted">
