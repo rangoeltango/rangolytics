@@ -3,8 +3,6 @@ name: Build and Deploy to GitHub Pages
 on:
   push:
     branches: ["main"]
-  schedule:
-    - cron: "0 10 * * *"  # daily 10:00 UTC (change as you like)
   workflow_dispatch:
 
 permissions:
