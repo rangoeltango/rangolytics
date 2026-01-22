@@ -7,14 +7,11 @@ OUT_DIR = ROOT / "site"
 OUT_FILE = OUT_DIR / "index.html"
 
 def main():
-    df = pd.read_csv(DATA_PATH)
-    df["date"] = pd.to_datetime(df["date"])
+    df = pd.read_excel(ROOT / "data" / "league_results.xlsx", sheet_name="Sheet1")
 
-    latest_date = df["date"].max().date()
-    total = df["value"].sum()
-    avg = df["value"].mean()
-
-    table_html = df.sort_values("date", ascending=False).to_html(index=False)
+    display_cols = ["Rank", "Team Name", "Owner Name", "W", "D", "L", "Total Score", "Total Points", "Total FFPts"]
+    display_cols = [c for c in display_cols if c in df.columns]
+    table_html = df[display_cols].sort_values("Rank").to_html(index=False)
 
     html = f"""<!doctype html>
 <html lang="en">
