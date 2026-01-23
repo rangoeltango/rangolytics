@@ -29,7 +29,7 @@ def main():
     
     display_cols = ["Rank", "Playoff", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
-    table_html = df[display_cols].sort_values("Rank").to_html(index=False, escape=False)
+    table_html = df[display_cols].sort_values("Rank").to_html(index=False, escape=False, classes="league-table", border=0)
     
     # Create MoTM standings data
     motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", "Wk 21 Result", "Wk 22 Result", "Wk 23 Opponent Team", "Wk 24 Opponent Team"]
@@ -174,10 +174,16 @@ def main():
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Farmer's League Football V</title>
+  <script>
+    // Device detection and auto-redirect
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {{
+      window.location.href = 'mobile.html';
+    }}
+  </script>
   <style>
     body {{ 
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
-      max-width: 900px; 
+      max-width: 1400px; 
       margin: 40px auto; 
       padding: 0 16px;
       background: linear-gradient(135deg, #2d1b69 0%, #3A083F 50%, #1f0a2e 100%);
@@ -235,6 +241,10 @@ def main():
       background: linear-gradient(135deg, #3A083F, #2d0631);
       z-index: 10;
     }}
+    th {{
+      color: white;
+      font-weight: bold;
+    }}
     th, td {{ 
       border-bottom: 1px solid #e5e7eb; 
       text-align: center; 
@@ -242,17 +252,27 @@ def main():
       font-size: 0.95rem;
       width: 8%;
     }}
-    th:nth-child(3), td:nth-child(3) {{
-      width: 25%;
+    /* League table styling - Team Name is 3rd column */
+    .league-table th:nth-child(3), .league-table td:nth-child(3) {{
+      width: 16%;
       text-align: left;
     }}
-    th:first-child, td:first-child {{
+    .league-table th:first-child, .league-table td:first-child {{
       text-align: center;
       width: 6%;
     }}
-    th:nth-child(2), td:nth-child(2) {{
+    .league-table th:nth-child(2), .league-table td:nth-child(2) {{
       text-align: center;
-      width: 6%;
+    }}
+    
+    /* MoTM table styling - Team Name is 1st column */
+    .dataframe th:first-child, .dataframe td:first-child {{
+      width: 16%;
+      text-align: left;
+    }}
+    .dataframe th:nth-child(3), .dataframe td:nth-child(3) {{
+      width: 8%;
+      text-align: center;
     }}
     th {{ 
       background: linear-gradient(135deg, #3A083F, #2d0631);
@@ -302,6 +322,10 @@ def main():
     <img src="logo.PNG" alt="League Logo" class="logo">
     Farmer's Football League 2025-2026
   </h1>
+  
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <a href="mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">Mobile Version</a>
+  </div>
 
   <div class="kpis">
     <div class="kpi">

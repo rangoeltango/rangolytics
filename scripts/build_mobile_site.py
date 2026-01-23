@@ -382,6 +382,9 @@ def main():
         <div class="hero-section">
             <img src="logo.PNG" alt="League Logo" class="logo">
             <h1 class="league-title">Farmer's Football League 2025-2026</h1>
+            <div class="text-center mt-3">
+                <a href="index.html" class="btn btn-outline-light btn-sm">🖥️ View Desktop Version</a>
+            </div>
         </div>
 
         <!-- Metric Cards -->
