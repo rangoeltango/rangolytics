@@ -13,7 +13,7 @@
   <style>
     body { 
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
-      max-width: 900px; 
+      max-width: 1200px; 
       margin: 40px auto; 
       padding: 0 16px;
       background: linear-gradient(135deg, #2d1b69 0%, #3A083F 50%, #1f0a2e 100%);
@@ -71,6 +71,10 @@
       background: linear-gradient(135deg, #3A083F, #2d0631);
       z-index: 10;
     }
+    th {
+      color: white;
+      font-weight: bold;
+    }
     th, td { 
       border-bottom: 1px solid #e5e7eb; 
       text-align: center; 
@@ -78,17 +82,27 @@
       font-size: 0.95rem;
       width: 8%;
     }
-    th:nth-child(3), td:nth-child(3) {
-      width: 25%;
+    /* League table styling - Team Name is 3rd column */
+    .league-table th:nth-child(3), .league-table td:nth-child(3) {
+      width: 16%;
       text-align: left;
     }
-    th:first-child, td:first-child {
+    .league-table th:first-child, .league-table td:first-child {
       text-align: center;
       width: 6%;
     }
-    th:nth-child(2), td:nth-child(2) {
+    .league-table th:nth-child(2), .league-table td:nth-child(2) {
       text-align: center;
-      width: 6%;
+    }
+    
+    /* MoTM table styling - Team Name is 1st column */
+    .dataframe th:first-child, .dataframe td:first-child {
+      width: 16%;
+      text-align: left;
+    }
+    .dataframe th:nth-child(3), .dataframe td:nth-child(3) {
+      width: 8%;
+      text-align: center;
     }
     th { 
       background: linear-gradient(135deg, #3A083F, #2d0631);
@@ -165,7 +179,7 @@
 
   <div class="card">
     <h2 class="large-title">League Standings</h2>
-    <table border="1" class="dataframe">
+    <table border="1" class="league-table">
   <thead>
     <tr style="text-align: right;">
       <th>Rank</th>
