@@ -30,6 +30,8 @@ def main():
     display_cols = ["Rank", "Playoff", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
     table_html = df[display_cols].sort_values("Rank").to_html(index=False, escape=False, classes="league-table", border=0)
+    # Remove the default 'dataframe' class that pandas adds
+    table_html = table_html.replace('class="dataframe league-table"', 'class="league-table"')
     
     # Create MoTM standings data
     motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", "Wk 21 Result", "Wk 22 Result", "Wk 23 Opponent Team", "Wk 24 Opponent Team"]
