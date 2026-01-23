@@ -170,6 +170,67 @@ def main():
     else:
         gw_chart_html = "<p>No gameweek data available</p>"
 
+    # Create 5 Week Form Table
+    if most_recent_week >= 5:
+        # Calculate 5-week range
+        start_week = most_recent_week - 4
+        end_week = most_recent_week
+        
+        # Calculate 5-week scores
+        five_week_cols = [f'Wk {w} Score' for w in range(start_week, end_week + 1)]
+        available_five_week_cols = [col for col in five_week_cols if col in df.columns]
+        
+        if available_five_week_cols:
+            # Calculate 5-week totals
+            df['5 Week Score'] = df[available_five_week_cols].sum(axis=1)
+            
+            # Calculate 5-week rank
+            df['5 Week Rank'] = df['5 Week Score'].rank(method='dense', ascending=False).astype(int)
+            
+            # Calculate behind 5-week high
+            five_week_high = df['5 Week Score'].max()
+            df['Behind 5 Week High'] = five_week_high - df['5 Week Score']
+            
+            # Prepare result columns for the 5 weeks
+            result_cols = [f'Wk {w} Result' for w in range(start_week, end_week + 1)]
+            available_result_cols = [col for col in result_cols if col in df.columns]
+            
+            # Create table columns
+            form_cols = ['Rank', '5 Week Rank', 'Team Name', '5 Week Score', 'Behind 5 Week High'] + available_result_cols
+            form_available_cols = [col for col in form_cols if col in df.columns]
+            
+            # Sort by 5 Week Score descending
+            form_df = df[form_available_cols].sort_values('5 Week Score', ascending=False)
+            
+            # Generate HTML table manually for proper styling
+            form_table_html = "<table border='1' class='form-table'><thead><tr style='text-align: right;'>"
+            for col in form_available_cols:
+                form_table_html += f"<th>{col}</th>"
+            form_table_html += "</tr></thead><tbody>"
+            
+            for _, row in form_df.iterrows():
+                form_table_html += "<tr>"
+                for col in form_available_cols:
+                    val = row[col]
+                    if col in available_result_cols and "Result" in col:
+                        # Color code results
+                        if val == "W":
+                            form_table_html += f'<td style="color: green; font-weight: bold;">{val}</td>'
+                        elif val == "D":
+                            form_table_html += f'<td style="color: #DAA520; font-weight: bold;">{val}</td>'
+                        elif val == "L":
+                            form_table_html += f'<td style="color: red; font-weight: bold;">{val}</td>'
+                        else:
+                            form_table_html += f'<td>{val}</td>'
+                    else:
+                        form_table_html += f'<td>{val}</td>'
+                form_table_html += "</tr>"
+            form_table_html += "</tbody></table>"
+        else:
+            form_table_html = "<p>5 Week Form data not available</p>"
+    else:
+        form_table_html = "<p>Not enough weeks of data for 5 Week Form table</p>"
+
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -276,6 +337,20 @@ def main():
       width: 8%;
       text-align: center;
     }}
+    
+    /* Form table styling - Team Name is 3rd column */
+    .form-table th:nth-child(3), .form-table td:nth-child(3) {{
+      width: 16%;
+      text-align: left;
+    }}
+    .form-table th:first-child, .form-table td:first-child {{
+      text-align: center;
+      width: 6%;
+    }}
+    .form-table th:nth-child(2), .form-table td:nth-child(2) {{
+      text-align: center;
+      width: 8%;
+    }}
     th {{ 
       background: linear-gradient(135deg, #3A083F, #2d0631);
       color: white;
@@ -362,6 +437,11 @@ def main():
   <div class="card">
     <h2 class="large-title">Latest Gameweek Results</h2>
     {gw_chart_html}
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">5 Week Form Table</h2>
+    {form_table_html}
   </div>
 
   <div class="muted">

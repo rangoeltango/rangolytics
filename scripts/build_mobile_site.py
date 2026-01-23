@@ -193,6 +193,77 @@ def main():
     else:
         gw_chart_html = "<p>No gameweek data available</p>"
 
+    # Create 5 Week Form Table
+    if most_recent_week >= 5:
+        # Calculate 5-week range
+        start_week = most_recent_week - 4
+        end_week = most_recent_week
+        
+        # Calculate 5-week scores
+        five_week_cols = [f'Wk {w} Score' for w in range(start_week, end_week + 1)]
+        available_five_week_cols = [col for col in five_week_cols if col in df.columns]
+        
+        if available_five_week_cols:
+            # Calculate 5-week totals
+            df['5 Week Score'] = df[available_five_week_cols].sum(axis=1)
+            
+            # Calculate 5-week rank
+            df['5 Week Rank'] = df['5 Week Score'].rank(method='dense', ascending=False).astype(int)
+            
+            # Calculate behind 5-week high
+            five_week_high = df['5 Week Score'].max()
+            df['Behind 5 Week High'] = five_week_high - df['5 Week Score']
+            
+            # Prepare result columns for the 5 weeks
+            result_cols = [f'Wk {w} Result' for w in range(start_week, end_week + 1)]
+            available_result_cols = [col for col in result_cols if col in df.columns]
+            
+            # Create table columns
+            form_cols = ['Rank', '5 Week Rank', 'Team Name', '5 Week Score', 'Behind 5 Week High'] + available_result_cols
+            form_available_cols = [col for col in form_cols if col in df.columns]
+            
+            # Sort by 5 Week Score descending
+            form_df = df[form_available_cols].sort_values('5 Week Score', ascending=False)
+            
+            # Create mobile-friendly table headers
+            form_table_headers = ""
+            for i, col in enumerate(form_available_cols):
+                if col == "Team Name":
+                    form_table_headers += f'<th scope="col" style="width: 25%;">{col}</th>'
+                elif col in ["Rank", "5 Week Rank"]:
+                    form_table_headers += f'<th scope="col" class="text-center" style="width: 8%;">{col}</th>'
+                else:
+                    form_table_headers += f'<th scope="col" class="text-center">{col}</th>'
+            
+            # Create mobile-friendly table rows
+            form_table_rows = ""
+            for _, row in form_df.iterrows():
+                cells = ""
+                for col in form_available_cols:
+                    val = row[col]
+                    if col in available_result_cols and "Result" in col:
+                        # Color code results
+                        if val == "W":
+                            cells += f'<td class="text-center" style="color: green; font-weight: bold;">{val}</td>'
+                        elif val == "D":
+                            cells += f'<td class="text-center" style="color: #DAA520; font-weight: bold;">{val}</td>'
+                        elif val == "L":
+                            cells += f'<td class="text-center" style="color: red; font-weight: bold;">{val}</td>'
+                        else:
+                            cells += f'<td class="text-center">{val}</td>'
+                    elif col == "Team Name":
+                        cells += f'<td>{val}</td>'
+                    else:
+                        cells += f'<td class="text-center">{val}</td>'
+                form_table_rows += f'<tr>{cells}</tr>\n'
+            
+        else:
+            form_table_headers = "<th>No Data</th>"
+            form_table_rows = "<tr><td>5 Week Form data not available</td></tr>"
+    else:
+        form_table_headers = "<th>No Data</th>"
+        form_table_rows = "<tr><td>Not enough weeks of data for 5 Week Form table</td></tr>"
+
     # Create column headers for table
     table_headers = ""
     for i, col in enumerate(display_cols):
@@ -455,6 +526,22 @@ def main():
             <h2 class="section-title">Latest Gameweek (GW{most_recent_week}) Results</h2>
             <div class="chart-container">
                 {gw_chart_html}
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">5 Week Form Table</h2>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            {form_table_headers}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {form_table_rows}
+                    </tbody>
+                </table>
             </div>
         </div>
 
