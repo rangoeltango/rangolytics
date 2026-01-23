@@ -31,6 +31,79 @@ def main():
     display_cols = [c for c in display_cols if c in df.columns]
     table_html = df[display_cols].sort_values("Rank").to_html(index=False, escape=False)
     
+    # Create MoTM standings data
+    motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", "Wk 21 Result", "Wk 22 Result", "Wk 23 Opponent Team", "Wk 24 Opponent Team"]
+    available_motm_cols = [col for col in motm_cols if col in df.columns]
+    
+    # If MoTM 7 Score Behind doesn't exist but MoTM 7 Score does, calculate it
+    if "MoTM 7 Score Behind" not in df.columns and "MoTM 7 Score" in df.columns:
+        max_score = df["MoTM 7 Score"].max()
+        df["MoTM 7 Score Behind"] = max_score - df["MoTM 7 Score"]
+        # Update available columns list
+        available_motm_cols = [col for col in motm_cols if col in df.columns]
+    
+    if len(available_motm_cols) > 2:  # At least Team Name and one other column
+        # Sort by MoTM 7 Points (high to low), then by MoTM 7 Score (high to low) for tiebreaking
+        sort_cols = []
+        sort_ascending = []
+        
+        if "MoTM 7 Points" in df.columns:
+            sort_cols.append("MoTM 7 Points")
+            sort_ascending.append(False)  # High to low
+            
+        if "MoTM 7 Score" in df.columns:
+            sort_cols.append("MoTM 7 Score")
+            sort_ascending.append(False)  # High to low
+            
+        if sort_cols:
+            motm_df = df[available_motm_cols].sort_values(sort_cols, ascending=sort_ascending)
+        else:
+            motm_df = df[available_motm_cols].sort_values(available_motm_cols[1], ascending=False)
+        
+        # Determine highest and second highest MoTM 7 Points values for flagging
+        if "MoTM 7 Points" in motm_df.columns:
+            unique_points = sorted(motm_df["MoTM 7 Points"].unique(), reverse=True)
+            highest_points = unique_points[0] if len(unique_points) > 0 else None
+            second_highest_points = unique_points[1] if len(unique_points) > 1 else None
+        else:
+            highest_points = None
+            second_highest_points = None
+        
+        # Create detailed table for MoTM standings with color coding
+        motm_table_html = "<table border='1' class='dataframe'><thead><tr style='text-align: right;'>"
+        for col in available_motm_cols:
+            motm_table_html += f"<th>{col}</th>"
+        motm_table_html += "</tr></thead><tbody>"
+        
+        for _, row in motm_df.iterrows():
+            motm_table_html += "<tr>"
+            for col in available_motm_cols:
+                val = row[col]
+                if col == "MoTM 7 Points":
+                    # Add flags based on point values
+                    if val == highest_points:
+                        motm_table_html += f'<td>🟢 {val}</td>'
+                    elif val == second_highest_points:
+                        motm_table_html += f'<td>🟡 {val}</td>'
+                    else:
+                        motm_table_html += f'<td>{val}</td>'
+                elif "Result" in col:
+                    # Color code results
+                    if val == "W":
+                        motm_table_html += f'<td style="color: green; font-weight: bold;">{val}</td>'
+                    elif val == "D":
+                        motm_table_html += f'<td style="color: orange; font-weight: bold;">{val}</td>'
+                    elif val == "L":
+                        motm_table_html += f'<td style="color: red; font-weight: bold;">{val}</td>'
+                    else:
+                        motm_table_html += f'<td>{val}</td>'
+                else:
+                    motm_table_html += f'<td>{val}</td>'
+            motm_table_html += "</tr>"
+        motm_table_html += "</tbody></table>"
+    else:
+        motm_table_html = "<p>MoTM data not available</p>"
+    
     # Create bar chart for Total Points by Team
     chart_df = df.sort_values("Total Points", ascending=False)
     fig = px.bar(
@@ -243,6 +316,11 @@ def main():
       <h3>Current MoTM Leader</h3>
       <p>{current_motm}</p>
     </div>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Current MoTM Standings</h2>
+    {motm_table_html}
   </div>
 
   <div class="card">

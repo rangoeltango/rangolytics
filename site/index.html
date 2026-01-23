@@ -4,6 +4,12 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Farmer's League Football V</title>
+  <script>
+    // Detect mobile devices and redirect to mobile version
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = 'mobile.html';
+    }
+  </script>
   <style>
     body { 
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
@@ -132,6 +138,10 @@
     <img src="logo.PNG" alt="League Logo" class="logo">
     Farmer's Football League 2025-2026
   </h1>
+  
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <a href="mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">📱 View Mobile Version</a>
+  </div>
 
   <div class="kpis">
     <div class="kpi">
@@ -146,6 +156,11 @@
       <h3>Current MoTM Leader</h3>
       <p>Momoney</p>
     </div>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Current MoTM Standings</h2>
+    <table border='1' class='dataframe'><thead><tr style='text-align: right;'><th>Team Name</th><th>MoTM 7 Points</th><th>MoTM 7 Score</th><th>MoTM 7 Score Behind</th><th>Wk 21 Result</th><th>Wk 22 Result</th><th>Wk 23 Opponent Team</th><th>Wk 24 Opponent Team</th></tr></thead><tbody><tr><td>Momoney</td><td>🟢 6</td><td>123</td><td>0</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>DropItLikeItsSlot</td><td>FARTETA OUT</td></tr><tr><td>C'mon you Whites!</td><td>🟢 6</td><td>106</td><td>-17</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>Praymaker</td><td>ChicagoFire</td></tr><tr><td>Slotte Slutte</td><td>🟢 6</td><td>99</td><td>-24</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>Bins FC</td><td>Saka Souffle</td></tr><tr><td>NYC Kopites</td><td>🟢 6</td><td>95</td><td>-28</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>FARTETA OUT</td><td>Lambchester City</td></tr><tr><td>Bins FC</td><td>🟢 6</td><td>95</td><td>-28</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>Slotte Slutte</td><td>Model Bangin Gits FC</td></tr><tr><td>Gunnersaurus</td><td>🟡 4</td><td>99</td><td>-24</td><td style="color: orange; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td><td>kyle</td><td>Spursy FC</td></tr><tr><td>ChicagoFire</td><td>🟡 4</td><td>97</td><td>-26</td><td style="color: orange; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td><td>Berba Juniors</td><td>C'mon you Whites!</td></tr><tr><td>FARTETA OUT</td><td>3</td><td>112</td><td>-11</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>NYC Kopites</td><td>Momoney</td></tr><tr><td>Ugarte be kidding me</td><td>3</td><td>109</td><td>-14</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td>Gabi-Gabi-Gabagool!</td><td>Minnows FC</td></tr><tr><td>Saka Souffle</td><td>3</td><td>107</td><td>-16</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>Spursy FC</td><td>Slotte Slutte</td></tr><tr><td>DropItLikeItsSlot</td><td>3</td><td>105</td><td>-18</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td>Momoney</td><td>Returning champs</td></tr><tr><td>Gabi-Gabi-Gabagool!</td><td>3</td><td>101</td><td>-22</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>Ugarte be kidding me</td><td>Praymaker</td></tr><tr><td>Berba Juniors</td><td>3</td><td>97</td><td>-26</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>ChicagoFire</td><td>kyle</td></tr><tr><td>Lambchester City</td><td>3</td><td>91</td><td>-32</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td>Minnows FC</td><td>NYC Kopites</td></tr><tr><td>Praymaker</td><td>0</td><td>101</td><td>-22</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>C'mon you Whites!</td><td>Gabi-Gabi-Gabagool!</td></tr><tr><td>kyle</td><td>0</td><td>97</td><td>-26</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Gunnersaurus</td><td>Berba Juniors</td></tr><tr><td>Minnows FC</td><td>0</td><td>93</td><td>-30</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Lambchester City</td><td>Ugarte be kidding me</td></tr><tr><td>Returning champs</td><td>0</td><td>90</td><td>-33</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Model Bangin Gits FC</td><td>DropItLikeItsSlot</td></tr><tr><td>Model Bangin Gits FC</td><td>0</td><td>73</td><td>-50</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Returning champs</td><td>Bins FC</td></tr><tr><td>Spursy FC</td><td>0</td><td>67</td><td>-56</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Saka Souffle</td><td>Gunnersaurus</td></tr></tbody></table>
   </div>
 
   <div class="card">
@@ -412,7 +427,7 @@
   </div>
 
   <div class="muted">
-    Generated at: 2026-01-22 22:14:13.777522+00:00 UTC
+    Generated at: 2026-01-23 19:35:32.879918+00:00 UTC
   </div>
 </body>
 </html>
