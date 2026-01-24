@@ -6,7 +6,7 @@ import plotly.io as pio
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "sample.csv"
 OUT_DIR = ROOT / "site"
-OUT_FILE = OUT_DIR / "index.html"
+OUT_FILE = OUT_DIR / "football-desktop.html"
 
 def main():
     df = pd.read_excel(ROOT / "data" / "league_results.xlsx", sheet_name="Sheet1")
@@ -240,7 +240,7 @@ def main():
   <script>
     // Device detection and auto-redirect
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {{
-      window.location.href = 'mobile.html';
+      window.location.href = 'football-mobile.html';
     }}
   </script>
   <style>
@@ -401,7 +401,8 @@ def main():
   </h1>
   
   <div style="text-align: center; margin-bottom: 2rem;">
-    <a href="mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">Mobile Version</a>
+    <a href="index.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; margin-right: 10px;">🏠 Home</a>
+    <a href="football-mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">Mobile Version</a>
   </div>
 
   <div class="kpis">

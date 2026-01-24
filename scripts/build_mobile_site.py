@@ -5,7 +5,7 @@ import plotly.io as pio
 
 ROOT = Path(__file__).parent.parent
 OUT_DIR = ROOT / "site"
-OUT_FILE = OUT_DIR / "mobile.html"
+OUT_FILE = OUT_DIR / "football-mobile.html"
 
 def main():
     df = pd.read_excel(ROOT / "data" / "league_results.xlsx", sheet_name="Sheet1")
@@ -454,7 +454,8 @@ def main():
             <img src="logo.PNG" alt="League Logo" class="logo">
             <h1 class="league-title">Farmer's Football League 2025-2026</h1>
             <div class="text-center mt-3">
-                <a href="index.html" class="btn btn-outline-light btn-sm">🖥️ View Desktop Version</a>
+                <a href="index.html" class="btn btn-outline-light btn-sm me-2">🏠 Home</a>
+                <a href="football-desktop.html" class="btn btn-outline-light btn-sm">🖥️ View Desktop Version</a>
             </div>
         </div>
 

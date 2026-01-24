@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Farmer's League Football V</title>
+  <script>
+    // Device detection and auto-redirect
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      window.location.href = 'football-mobile.html';
+    }
+  </script>
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
+      max-width: 1400px; 
+      margin: 40px auto; 
+      padding: 0 16px;
+      background: linear-gradient(135deg, #2d1b69 0%, #3A083F 50%, #1f0a2e 100%);
+      min-height: 100vh;
+    }
+    h1 {
+      color: #ffffff;
+      text-align: center;
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 1rem;
+    }
+    .logo {
+      height: 60px;
+      width: auto;
+    }
+    .card { 
+      border: 1px solid #d8b4fe; 
+      border-radius: 16px; 
+      padding: 20px; 
+      margin: 20px 0; 
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    .card h2 {
+      color: #3A083F;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    table { 
+      border-collapse: separate; 
+      width: 100%; 
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      max-height: 400px;
+      overflow-y: auto;
+      display: block;
+    }
+    table thead, table tbody {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+    table thead {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #3A083F, #2d0631);
+      z-index: 10;
+    }
+    th {
+      color: white;
+      font-weight: bold;
+    }
+    th, td { 
+      border-bottom: 1px solid #e5e7eb; 
+      text-align: center; 
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      width: 8%;
+    }
+    /* League table styling - Team Name is 3rd column */
+    .league-table th:nth-child(3), .league-table td:nth-child(3) {
+      width: 16%;
+      text-align: left;
+    }
+    .league-table th:first-child, .league-table td:first-child {
+      text-align: center;
+      width: 6%;
+    }
+    .league-table th:nth-child(2), .league-table td:nth-child(2) {
+      text-align: center;
+    }
+    
+    /* MoTM table styling - Team Name is 1st column */
+    .dataframe th:first-child, .dataframe td:first-child {
+      width: 16%;
+      text-align: left;
+    }
+    .dataframe th:nth-child(3), .dataframe td:nth-child(3) {
+      width: 8%;
+      text-align: center;
+    }
+    
+    /* Form table styling - Team Name is 3rd column */
+    .form-table th:nth-child(3), .form-table td:nth-child(3) {
+      width: 16%;
+      text-align: left;
+    }
+    .form-table th:first-child, .form-table td:first-child {
+      text-align: center;
+      width: 6%;
+    }
+    .form-table th:nth-child(2), .form-table td:nth-child(2) {
+      text-align: center;
+      width: 8%;
+    }
+    th { 
+      background: linear-gradient(135deg, #3A083F, #2d0631);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+    }
+    td {
+      background: white;
+    }
+    tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+    tr:hover td {
+      background: #faf7ff;
+    }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .kpi { border: 1px solid #d8b4fe; border-radius: 14px; padding: 12px; background: rgba(255, 255, 255, 0.8); }
+    .kpi h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3A083F;
+      margin: 0 0 0.5rem 0;
+      text-align: center;
+    }
+    .kpi p {
+      font-size: 1rem;
+      font-weight: normal;
+      color: #000;
+      margin: 0;
+      text-align: center;
+    }
+    .muted { color: #6b7280; text-align: center; margin-top: 2rem; }
+    .large-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3A083F;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    <img src="logo.PNG" alt="League Logo" class="logo">
+    Farmer's Football League 2025-2026
+  </h1>
+  
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <a href="index.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; margin-right: 10px;">🏠 Home</a>
+    <a href="football-mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">Mobile Version</a>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <h3>League Leader</h3>
+      <p>ChicagoFire</p>
+    </div>
+    <div class="kpi">
+      <h3>Last MoTM Champ</h3>
+      <p>Gabi-Gabi-Gabagool</p>
+    </div>
+    <div class="kpi">
+      <h3>Current MoTM Leader</h3>
+      <p>Momoney</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Current MoTM Standings</h2>
+    <table border='1' class='dataframe'><thead><tr style='text-align: right;'><th>Team Name</th><th>MoTM 7 Points</th><th>MoTM 7 Score</th><th>MoTM 7 Score Behind</th><th>Wk 21 Result</th><th>Wk 22 Result</th><th>Wk 23 Opponent Team</th><th>Wk 24 Opponent Team</th></tr></thead><tbody><tr><td>Momoney</td><td>🟢 6</td><td>123</td><td>0</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>DropItLikeItsSlot</td><td>FARTETA OUT</td></tr><tr><td>C'mon you Whites!</td><td>🟢 6</td><td>106</td><td>-17</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>Praymaker</td><td>ChicagoFire</td></tr><tr><td>Slotte Slutte</td><td>🟢 6</td><td>99</td><td>-24</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>Bins FC</td><td>Saka Souffle</td></tr><tr><td>NYC Kopites</td><td>🟢 6</td><td>95</td><td>-28</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>FARTETA OUT</td><td>Lambchester City</td></tr><tr><td>Bins FC</td><td>🟢 6</td><td>95</td><td>-28</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td>Slotte Slutte</td><td>Model Bangin Gits FC</td></tr><tr><td>Gunnersaurus</td><td>🟡 4</td><td>99</td><td>-24</td><td style="color: orange; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td><td>kyle</td><td>Spursy FC</td></tr><tr><td>ChicagoFire</td><td>🟡 4</td><td>97</td><td>-26</td><td style="color: orange; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td><td>Berba Juniors</td><td>C'mon you Whites!</td></tr><tr><td>FARTETA OUT</td><td>3</td><td>112</td><td>-11</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>NYC Kopites</td><td>Momoney</td></tr><tr><td>Ugarte be kidding me</td><td>3</td><td>109</td><td>-14</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td>Gabi-Gabi-Gabagool!</td><td>Minnows FC</td></tr><tr><td>Saka Souffle</td><td>3</td><td>107</td><td>-16</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>Spursy FC</td><td>Slotte Slutte</td></tr><tr><td>DropItLikeItsSlot</td><td>3</td><td>105</td><td>-18</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td>Momoney</td><td>Returning champs</td></tr><tr><td>Gabi-Gabi-Gabagool!</td><td>3</td><td>101</td><td>-22</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>Ugarte be kidding me</td><td>Praymaker</td></tr><tr><td>Berba Juniors</td><td>3</td><td>97</td><td>-26</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td>ChicagoFire</td><td>kyle</td></tr><tr><td>Lambchester City</td><td>3</td><td>91</td><td>-32</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td>Minnows FC</td><td>NYC Kopites</td></tr><tr><td>Praymaker</td><td>0</td><td>101</td><td>-22</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>C'mon you Whites!</td><td>Gabi-Gabi-Gabagool!</td></tr><tr><td>kyle</td><td>0</td><td>97</td><td>-26</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Gunnersaurus</td><td>Berba Juniors</td></tr><tr><td>Minnows FC</td><td>0</td><td>93</td><td>-30</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Lambchester City</td><td>Ugarte be kidding me</td></tr><tr><td>Returning champs</td><td>0</td><td>90</td><td>-33</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Model Bangin Gits FC</td><td>DropItLikeItsSlot</td></tr><tr><td>Model Bangin Gits FC</td><td>0</td><td>73</td><td>-50</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Returning champs</td><td>Bins FC</td></tr><tr><td>Spursy FC</td><td>0</td><td>67</td><td>-56</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td>Saka Souffle</td><td>Gunnersaurus</td></tr></tbody></table>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">League Standings</h2>
+    <table class="league-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Rank</th>
+      <th>Playoff</th>
+      <th>Team Name</th>
+      <th>Total Score</th>
+      <th>Total Points</th>
+      <th>W</th>
+      <th>D</th>
+      <th>L</th>
+      <th>Total FFPts</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>🏆</td>
+      <td>ChicagoFire</td>
+      <td>1322</td>
+      <td>49</td>
+      <td>16</td>
+      <td>1</td>
+      <td>5</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>⭐</td>
+      <td>Berba Juniors</td>
+      <td>1295</td>
+      <td>48</td>
+      <td>16</td>
+      <td>0</td>
+      <td>6</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>⭐</td>
+      <td>Gunnersaurus</td>
+      <td>1244</td>
+      <td>40</td>
+      <td>13</td>
+      <td>1</td>
+      <td>8</td>
+      <td>75</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>⭐</td>
+      <td>Momoney</td>
+      <td>1295</td>
+      <td>39</td>
+      <td>13</td>
+      <td>0</td>
+      <td>9</td>
+      <td>78</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>⭐</td>
+      <td>NYC Kopites</td>
+      <td>1185</td>
+      <td>39</td>
+      <td>13</td>
+      <td>0</td>
+      <td>9</td>
+      <td>64</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>⭐</td>
+      <td>Saka Souffle</td>
+      <td>1288</td>
+      <td>37</td>
+      <td>12</td>
+      <td>1</td>
+      <td>9</td>
+      <td>78</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>⭐</td>
+      <td>Lambchester City</td>
+      <td>1221</td>
+      <td>37</td>
+      <td>12</td>
+      <td>1</td>
+      <td>9</td>
+      <td>71</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>⭐</td>
+      <td>Ugarte be kidding me</td>
+      <td>1221</td>
+      <td>37</td>
+      <td>12</td>
+      <td>1</td>
+      <td>9</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td></td>
+      <td>Gabi-Gabi-Gabagool!</td>
+      <td>1271</td>
+      <td>34</td>
+      <td>11</td>
+      <td>1</td>
+      <td>10</td>
+      <td>78</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td></td>
+      <td>FARTETA OUT</td>
+      <td>1217</td>
+      <td>34</td>
+      <td>11</td>
+      <td>1</td>
+      <td>10</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td></td>
+      <td>Slotte Slutte</td>
+      <td>1132</td>
+      <td>34</td>
+      <td>11</td>
+      <td>1</td>
+      <td>10</td>
+      <td>59</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td></td>
+      <td>C'mon you Whites!</td>
+      <td>1196</td>
+      <td>33</td>
+      <td>11</td>
+      <td>0</td>
+      <td>11</td>
+      <td>68</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td></td>
+      <td>Bins FC</td>
+      <td>1205</td>
+      <td>32</td>
+      <td>10</td>
+      <td>2</td>
+      <td>10</td>
+      <td>71</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td></td>
+      <td>Returning champs</td>
+      <td>1136</td>
+      <td>27</td>
+      <td>9</td>
+      <td>0</td>
+      <td>13</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td></td>
+      <td>kyle</td>
+      <td>1121</td>
+      <td>27</td>
+      <td>9</td>
+      <td>0</td>
+      <td>13</td>
+      <td>57</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td></td>
+      <td>DropItLikeItsSlot</td>
+      <td>1152</td>
+      <td>23</td>
+      <td>7</td>
+      <td>2</td>
+      <td>13</td>
+      <td>61</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td></td>
+      <td>Minnows FC</td>
+      <td>1164</td>
+      <td>21</td>
+      <td>7</td>
+      <td>0</td>
+      <td>15</td>
+      <td>67</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td></td>
+      <td>Praymaker</td>
+      <td>1084</td>
+      <td>21</td>
+      <td>7</td>
+      <td>0</td>
+      <td>15</td>
+      <td>54</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td></td>
+      <td>Spursy FC</td>
+      <td>1068</td>
+      <td>21</td>
+      <td>7</td>
+      <td>0</td>
+      <td>15</td>
+      <td>53</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td></td>
+      <td>Model Bangin Gits FC</td>
+      <td>1161</td>
+      <td>20</td>
+      <td>6</td>
+      <td>2</td>
+      <td>14</td>
+      <td>60</td>
+    </tr>
+  </tbody>
+</table>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Total Points by Team</h2>
+    <html>
+<head><meta charset="utf-8" /></head>
+<body>
+    <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.1.min.js" integrity="sha256-4rD3fugVb/nVJYUv5Ky3v+fYXoouHaBSP20WIJuEiWg=" crossorigin="anonymous"></script>                <div id="points-chart" class="plotly-graph-div" style="height:600px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("points-chart")) {                    Plotly.newPlot(                        "points-chart",                        [{"hovertemplate":"Team Name=%{x}\u003cbr\u003eTotal Points=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#3A083F","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAACASEAAAAAAAABIQAAAAAAAAERAAAAAAACAQ0AAAAAAAIBDQAAAAAAAgEJAAAAAAACAQkAAAAAAAIBCQAAAAAAAAEFAAAAAAAAAQUAAAAAAAABBQAAAAAAAgEBAAAAAAAAAQEAAAAAAAAA7QAAAAAAAADtAAAAAAAAAN0AAAAAAAAA1QAAAAAAAADVAAAAAAAAANUAAAAAAAAA0QA=="},"textposition":"outside","x":["ChicagoFire","Berba Juniors","Gunnersaurus","Momoney","NYC Kopites","Saka Souffle","Lambchester City","Ugarte be kidding me","Gabi-Gabi-Gabagool!","FARTETA OUT","Slotte Slutte","C'mon you Whites!","Bins FC","Returning champs","kyle","DropItLikeItsSlot","Minnows FC","Praymaker","Spursy FC","Model Bangin Gits FC"],"xaxis":"x","y":{"dtype":"i1","bdata":"MTAoJyclJSUiIiIhIBsbFxUVFRQ="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Team Name"},"tickangle":-45},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Total Points"}},"legend":{"tracegroupgap":0},"title":{"text":"Total Points by Team"},"barmode":"relative","margin":{"b":100,"t":80},"font":{"family":"system-ui, -apple-system, Segoe UI, Roboto, sans-serif"},"height":600},                        {"responsive": true}                    )                };            </script>        </div>
+</body>
+</html>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Latest Gameweek Results</h2>
+    <html>
+<head><meta charset="utf-8" /></head>
+<body>
+    <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.1.min.js" integrity="sha256-4rD3fugVb/nVJYUv5Ky3v+fYXoouHaBSP20WIJuEiWg=" crossorigin="anonymous"></script>                <div id="gameweek-chart" class="plotly-graph-div" style="height:600px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("gameweek-chart")) {                    Plotly.newPlot(                        "gameweek-chart",                        [{"hovertemplate":"Team Name=%{x}\u003cbr\u003eScore=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":["green","green","green","red","green","green","red","red","red","red","green","green","green","red","green","green","red","red","red","red"],"pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAAAASkAAAAAAAABIQAAAAAAAAEdAAAAAAAAAR0AAAAAAAABFQAAAAAAAAEVAAAAAAACAREAAAAAAAABEQAAAAAAAAERAAAAAAACAQ0AAAAAAAABDQAAAAAAAgEJAAAAAAAAAQkAAAAAAAABCQAAAAAAAAEJAAAAAAAAAQkAAAAAAAIBBQAAAAAAAgEFAAAAAAAAAPkAAAAAAAAA9QA=="},"textposition":"outside","x":["DropItLikeItsSlot","Ugarte be kidding me","Momoney","Praymaker","Slotte Slutte","C'mon you Whites!","Minnows FC","FARTETA OUT","Saka Souffle","kyle","Gunnersaurus","NYC Kopites","ChicagoFire","Berba Juniors","Bins FC","Lambchester City","Gabi-Gabi-Gabagool!","Returning champs","Model Bangin Gits FC","Spursy FC"],"xaxis":"x","y":{"dtype":"i1","bdata":"NDAuLioqKSgoJyYlJCQkJCMjHh0="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Team Name"},"tickangle":-45},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Score"}},"legend":{"tracegroupgap":0},"title":{"text":"Gameweek 22 Results"},"barmode":"relative","margin":{"b":100,"t":80},"font":{"family":"system-ui, -apple-system, Segoe UI, Roboto, sans-serif"},"height":600,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+</body>
+</html>
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">5 Week Form Table</h2>
+    <table border='1' class='form-table'><thead><tr style='text-align: right;'><th>Rank</th><th>5 Week Rank</th><th>Team Name</th><th>5 Week Score</th><th>Behind 5 Week High</th><th>Wk 18 Result</th><th>Wk 19 Result</th><th>Wk 20 Result</th><th>Wk 21 Result</th><th>Wk 22 Result</th></tr></thead><tbody><tr><td>4</td><td>1</td><td>Momoney</td><td>278</td><td>0</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>8</td><td>2</td><td>Ugarte be kidding me</td><td>271</td><td>7</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>9</td><td>3</td><td>Gabi-Gabi-Gabagool!</td><td>259</td><td>19</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>10</td><td>4</td><td>FARTETA OUT</td><td>255</td><td>23</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>5</td><td>4</td><td>NYC Kopites</td><td>255</td><td>23</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>6</td><td>5</td><td>Saka Souffle</td><td>252</td><td>26</td><td style="color: #DAA520; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>17</td><td>6</td><td>Minnows FC</td><td>244</td><td>34</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>12</td><td>7</td><td>C'mon you Whites!</td><td>238</td><td>40</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>13</td><td>8</td><td>Bins FC</td><td>233</td><td>45</td><td style="color: #DAA520; font-weight: bold;">D</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>16</td><td>9</td><td>DropItLikeItsSlot</td><td>231</td><td>47</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>1</td><td>9</td><td>ChicagoFire</td><td>231</td><td>47</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: #DAA520; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>15</td><td>10</td><td>kyle</td><td>230</td><td>48</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>3</td><td>11</td><td>Gunnersaurus</td><td>227</td><td>51</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: #DAA520; font-weight: bold;">D</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>7</td><td>12</td><td>Lambchester City</td><td>224</td><td>54</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>2</td><td>13</td><td>Berba Juniors</td><td>223</td><td>55</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>18</td><td>13</td><td>Praymaker</td><td>223</td><td>55</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>11</td><td>14</td><td>Slotte Slutte</td><td>209</td><td>69</td><td style="color: #DAA520; font-weight: bold;">D</td><td style="color: red; font-weight: bold;">L</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td><td style="color: green; font-weight: bold;">W</td></tr><tr><td>20</td><td>15</td><td>Model Bangin Gits FC</td><td>199</td><td>79</td><td style="color: #DAA520; font-weight: bold;">D</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>14</td><td>16</td><td>Returning champs</td><td>178</td><td>100</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td></tr><tr><td>19</td><td>17</td><td>Spursy FC</td><td>177</td><td>101</td><td style="color: green; font-weight: bold;">W</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td><td style="color: red; font-weight: bold;">L</td></tr></tbody></table>
+  </div>
+
+  <div class="muted">
+    Generated at: 2026-01-24 16:19:03.296491+00:00 UTC
+  </div>
+</body>
+</html>
