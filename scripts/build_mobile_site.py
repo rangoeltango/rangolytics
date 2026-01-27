@@ -199,8 +199,25 @@ def main():
     display_cols = ["Rank", "Playoff", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
     
-    # Create MoTM standings data
-    motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", "Wk 21 Result", "Wk 22 Result", "Wk 23 Opponent Team", "Wk 24 Opponent Team"]
+    # Create MoTM standings data - use dynamic week calculation
+    current_week = most_recent_week if most_recent_week > 0 else 23
+    next_week = current_week + 1
+    prev_week_1 = max(1, current_week - 1)
+    prev_week_2 = max(1, current_week - 2)
+    
+    # Check if we have results for current week or just opponents
+    current_result_col = f'Wk {current_week} Result'
+    current_opponent_col = f'Wk {current_week} Opponent Team'
+    next_opponent_col = f'Wk {next_week} Opponent Team'
+    
+    # Use results if available, otherwise use opponents
+    if current_result_col in df.columns:
+        week_col = current_result_col
+    else:
+        week_col = current_opponent_col
+        
+    motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", 
+                 f"Wk {prev_week_2} Result", f"Wk {prev_week_1} Result", week_col, next_opponent_col]
     available_motm_cols = [col for col in motm_cols if col in df.columns]
     
     # If MoTM 7 Score Behind doesn't exist but MoTM 7 Score does, calculate it
