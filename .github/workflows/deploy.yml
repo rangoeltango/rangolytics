@@ -30,15 +30,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: Fetch latest FPL data
         run: |
           python scripts/fetch_fpl.py
           test -f data/league_results.xlsx
+          
+      - name: Fetch current gameweek lineup data
+        run: |
+          python scripts/fetch_current_gw.py
+          test -f data/lineup_data.xlsx
 
       - name: Build site
         run: |
           python scripts/build_site.py
+          python scripts/build_mobile_site.py
           test -f site/index.html
 
       - name: Upload Pages artifact
