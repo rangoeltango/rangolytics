@@ -6,10 +6,172 @@ import plotly.io as pio
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "sample.csv"
 OUT_DIR = ROOT / "site"
-OUT_FILE = OUT_DIR / "football-desktop.html"
+OUT_FILE = OUT_DIR / "farmers-desktop.html"
+
+def load_lineup_data():
+    """Load and process lineup data"""
+    try:
+        lineup_df = pd.read_excel(ROOT / "data" / "lineup_data.xlsx")
+        return lineup_df
+    except FileNotFoundError:
+        return None
+
+def get_current_lineup_gameweek(lineup_df):
+    """Get the current gameweek that has lineup data"""
+    if lineup_df is None:
+        return None
+    
+    # Find GW score columns in lineup data
+    gw_cols = [col for col in lineup_df.columns if col.startswith('GW ') and col.endswith(' Score')]
+    
+    if not gw_cols:
+        return None
+    
+    # Extract gameweek numbers and return the highest one
+    gw_numbers = []
+    for col in gw_cols:
+        try:
+            gw_num = int(col.split(' ')[1])
+            gw_numbers.append(gw_num)
+        except (IndexError, ValueError):
+            continue
+    
+    return max(gw_numbers) if gw_numbers else None
+
+def get_team_lineup_for_gw(lineup_df, team_name, gw):
+    """Get lineup for specific team and gameweek"""
+    if lineup_df is None:
+        return []
+    
+    team_data = lineup_df[lineup_df['Team Name'] == team_name]
+    if team_data.empty:
+        return []
+    
+    lineup = []
+    for _, row in team_data.iterrows():
+        # Our new format has simplified columns
+        score_col = f'GW {gw} Score'
+        
+        if 'Player' in row and pd.notna(row['Player']) and row['Player'] != '':
+            player_info = {
+                'name': row['Player'],
+                'position': row['Position Type'],  # Use Position Type for grouping
+                'position_number': row['Position'],  # Keep numeric position for ordering
+                'score': row[score_col] if score_col in row and pd.notna(row[score_col]) else 0,
+                'status': '',  # Not available in new format
+                'is_captain': row['Is Captain'] if pd.notna(row['Is Captain']) else False,
+                'is_vice': row['Is Vice Captain'] if pd.notna(row['Is Vice Captain']) else False,
+                'is_effective_captain': False  # Can derive from multiplier if needed
+            }
+            lineup.append(player_info)
+    
+    return lineup
+
+def generate_lineup_html(lineup, team_name, opponent_lineup=None):
+    """Generate HTML for team lineup"""
+    if not lineup:
+        return f"<p>No lineup data available for {team_name}</p>"
+    
+    # Process captain scoring
+    processed_lineup = []
+    captain_player = None
+    vice_captain_player = None
+    
+    for player in lineup:
+        player_copy = player.copy()
+        if player['is_captain']:
+            captain_player = player_copy
+        elif player['is_vice']:
+            vice_captain_player = player_copy
+        processed_lineup.append(player_copy)
+    
+    # Apply captain scoring logic
+    if captain_player and captain_player['score'] > 0:
+        # Captain played, double their score
+        captain_player['score'] *= 2
+        captain_player['captain_scored'] = True
+    elif vice_captain_player and vice_captain_player['score'] > 0:
+        # Captain didn't play, double vice-captain's score
+        vice_captain_player['score'] *= 2
+        vice_captain_player['captain_scored'] = True
+    
+    # Get opponent player names for comparison
+    opponent_players = set()
+    if opponent_lineup:
+        opponent_players = {p['name'] for p in opponent_lineup}
+    
+    html = f"<div class='lineup-container'>"
+    
+    # Separate starters and bench players
+    starters = [p for p in processed_lineup if p['position_number'] <= 11]
+    bench = [p for p in processed_lineup if p['position_number'] > 11]
+    
+    # Sort by score (highest to lowest)
+    starters.sort(key=lambda x: x['score'], reverse=True)
+    bench.sort(key=lambda x: x['score'], reverse=True)
+    
+    # Find highest scorer in the team
+    all_players = starters + bench
+    highest_score = max((p['score'] for p in all_players), default=0)
+    
+    # Show starters
+    if starters:
+        html += "<div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5>"
+        for player in starters:
+            captain_badge = ""
+            if player['is_effective_captain']:
+                captain_badge = " <span class='captain-badge effective'>C</span>"
+            elif player['is_captain']:
+                captain_badge = " <span class='captain-badge'>C</span>"
+            elif player['is_vice']:
+                captain_badge = " <span class='captain-badge vice'>VC</span>"
+            
+            # Add captain multiplier indicator
+            if player.get('captain_scored', False):
+                captain_badge += " <span class='multiplier-badge'>×2</span>"
+            
+            # Add star for highest scorer
+            star = " ⭐" if player['score'] == highest_score and highest_score > 0 else ""
+            
+            # Check if player is on both teams
+            common_indicator = " <span class='common-player'>🤝</span>" if player['name'] in opponent_players else ""
+            
+            score_display = int(player['score']) if player['score'] != 0 and pd.notna(player['score']) else 0
+            html += f"""<div class='player-row starter'>
+                <span class='player-info'>{player['name']} - {player['position']} - {score_display} pts{star}{captain_badge}{common_indicator}</span>
+            </div>"""
+        html += "</div>"
+    
+    # Show bench
+    if bench:
+        html += "<div class='lineup-group'><h4 style='color: #6c757d; margin-bottom: 12px; margin-top: 20px;'>BENCH</h4>"
+        for player in bench:
+            captain_badge = ""
+            if player['is_vice']:
+                captain_badge = " <span class='captain-badge vice'>VC</span>"
+            
+            # Add captain multiplier indicator
+            if player.get('captain_scored', False):
+                captain_badge += " <span class='multiplier-badge'>×2</span>"
+            
+            # Add star for highest scorer
+            star = " ⭐" if player['score'] == highest_score and highest_score > 0 else ""
+            
+            # Check if player is on both teams
+            common_indicator = " <span class='common-player'>🤝</span>" if player['name'] in opponent_players else ""
+            
+            score_display = int(player['score']) if player['score'] != 0 and pd.notna(player['score']) else 0
+            html += f"""<div class='player-row bench'>
+                <span class='player-info'>{player['name']} - {player['position']} - {score_display} pts{star}{captain_badge}{common_indicator}</span>
+            </div>"""
+        html += "</div>"
+    
+    html += "</div>"
+    return html
 
 def main():
     df = pd.read_excel(ROOT / "data" / "league_results.xlsx", sheet_name="Sheet1")
+    lineup_df = load_lineup_data()
 
     # Add playoff indicators
     df['Playoff'] = df['Rank'].apply(lambda x: '🏆' if x == 1 else '⭐' if x <= 8 else '')
@@ -33,8 +195,27 @@ def main():
     # Remove the default 'dataframe' class that pandas adds
     table_html = table_html.replace('class="dataframe league-table"', 'class="league-table"')
     
-    # Create MoTM standings data
-    motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", "Wk 21 Result", "Wk 22 Result", "Wk 23 Opponent Team", "Wk 24 Opponent Team"]
+    # Find most recent week with data first (moved up from later in code)
+    score_cols = [col for col in df.columns if col.startswith('Wk ') and col.endswith(' Score')]
+    most_recent_week = 0
+    for col in score_cols:
+        week_num = int(col.split()[1])
+        if not df[col].isna().all() and df[col].sum() > 0:  # Has actual scores
+            most_recent_week = max(most_recent_week, week_num)
+    
+    # Create MoTM standings data with dynamic columns based on current gameweek
+    motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind"]
+    
+    # Add gameweek columns dynamically - show last 3 completed weeks and next upcoming week
+    if most_recent_week > 0:
+        # Add last 3 weeks as results (or fewer if not enough weeks have passed)
+        for week in range(max(1, most_recent_week - 2), most_recent_week + 1):
+            motm_cols.append(f"Wk {week} Result")
+        
+        # Add next week as opponent team
+        next_week = most_recent_week + 1
+        motm_cols.append(f"Wk {next_week} Opponent Team")
+    
     available_motm_cols = [col for col in motm_cols if col in df.columns]
     
     # If MoTM 7 Score Behind doesn't exist but MoTM 7 Score does, calculate it
@@ -125,14 +306,6 @@ def main():
         font=dict(family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif")
     )
     chart_html = pio.to_html(fig, include_plotlyjs='cdn', div_id="points-chart")
-    
-    # Find most recent week with data
-    score_cols = [col for col in df.columns if col.startswith('Wk ') and col.endswith(' Score')]
-    most_recent_week = 0
-    for col in score_cols:
-        week_num = int(col.split()[1])
-        if not df[col].isna().all() and df[col].sum() > 0:  # Has actual scores
-            most_recent_week = max(most_recent_week, week_num)
     
     # Create gameweek results chart
     if most_recent_week > 0:
@@ -231,6 +404,135 @@ def main():
     else:
         form_table_html = "<p>Not enough weeks of data for 5 Week Form table</p>"
 
+    # Create GW Matchups section
+    if most_recent_week > 0:
+        opponent_team_col = f'Wk {most_recent_week} Opponent Team'
+        opponent_score_col = f'Wk {most_recent_week} Opponent Score'
+        team_score_col = f'Wk {most_recent_week} Score'
+        team_result_col = f'Wk {most_recent_week} Result'
+        
+        if all(col in df.columns for col in [opponent_team_col, opponent_score_col, team_score_col]):
+            # Create matchups data
+            matchups_html = "<div class='matchups-container'>"            
+            processed_teams = set()
+            matchup_data = []
+            
+            for _, team_row in df.iterrows():
+                team_name = team_row['Team Name']
+                if team_name in processed_teams:
+                    continue
+                
+                opponent_name = team_row[opponent_team_col]
+                team_score = team_row[team_score_col] if pd.notna(team_row[team_score_col]) else 0
+                opponent_score = team_row[opponent_score_col] if pd.notna(team_row[opponent_score_col]) else 0
+                team_result = team_row[team_result_col] if team_result_col in df.columns else 'TBD'
+                
+                # Get team record (W-D-L)
+                team_w = team_row['W'] if 'W' in df.columns else 0
+                team_d = team_row['D'] if 'D' in df.columns else 0
+                team_l = team_row['L'] if 'L' in df.columns else 0
+                team_record = f"({int(team_w)}-{int(team_d)}-{int(team_l)})"
+                
+                # Find opponent row for their result and record
+                opponent_row = df[df['Team Name'] == opponent_name]
+                opponent_result = 'TBD'
+                opponent_record = "(0-0-0)"
+                if not opponent_row.empty:
+                    if team_result_col in df.columns:
+                        opponent_result = opponent_row.iloc[0][team_result_col]
+                    # Get opponent record
+                    opp_w = opponent_row.iloc[0]['W'] if 'W' in df.columns else 0
+                    opp_d = opponent_row.iloc[0]['D'] if 'D' in df.columns else 0
+                    opp_l = opponent_row.iloc[0]['L'] if 'L' in df.columns else 0
+                    opponent_record = f"({int(opp_w)}-{int(opp_d)}-{int(opp_l)})"
+                
+                # Calculate score difference
+                score_diff = abs(team_score - opponent_score)
+                
+                # Store matchup data for sorting
+                matchup_data.append({
+                    'team_name': team_name,
+                    'team_score': team_score,
+                    'team_result': team_result,
+                    'team_record': team_record,
+                    'opponent_name': opponent_name,
+                    'opponent_score': opponent_score,
+                    'opponent_result': opponent_result,
+                    'opponent_record': opponent_record,
+                    'score_diff': score_diff
+                })
+                
+                # Mark both teams as processed
+                processed_teams.add(team_name)
+                processed_teams.add(opponent_name)
+            
+            # Sort matchups by score difference (smallest margin first)
+            matchup_data.sort(key=lambda x: x['score_diff'])
+            
+            # Generate HTML for sorted matchups
+            for i, matchup in enumerate(matchup_data):
+                # Determine styling based on results
+                team_class = 'win' if matchup['team_result'] == 'W' else 'loss' if matchup['team_result'] == 'L' else 'draw' if matchup['team_result'] == 'D' else 'pending'
+                opponent_class = 'win' if matchup['opponent_result'] == 'W' else 'loss' if matchup['opponent_result'] == 'L' else 'draw' if matchup['opponent_result'] == 'D' else 'pending'
+                
+                # Handle singular/plural for points
+                point_text = "pt" if matchup['score_diff'] == 1 else "pts"
+                
+                # Generate lineup data for both teams
+                current_lineup_gw = get_current_lineup_gameweek(lineup_df)
+                if current_lineup_gw:
+                    team_lineup = get_team_lineup_for_gw(lineup_df, matchup['team_name'], current_lineup_gw)
+                    opponent_lineup = get_team_lineup_for_gw(lineup_df, matchup['opponent_name'], current_lineup_gw)
+                else:
+                    team_lineup = []
+                    opponent_lineup = []
+                
+                team_lineup_html = generate_lineup_html(team_lineup, matchup['team_name'], opponent_lineup)
+                opponent_lineup_html = generate_lineup_html(opponent_lineup, matchup['opponent_name'], team_lineup)
+                
+                matchups_html += f"""
+                <div class="matchup-card">
+                    <div class="team-card {team_class}">
+                        <div class="team-name">
+                            {matchup['team_name']} {matchup['team_record']}
+                            <button class="expand-btn" onclick="toggleLineup('lineup-{i}')" title="View Lineups">📋</button>
+                        </div>
+                        <div class="team-score">{matchup['team_score']:.0f}</div>
+                        <div class="team-result">{matchup['team_result']}</div>
+                    </div>
+                    <div class="vs-section">
+                        <div class="vs-text">VS</div>
+                        <div class="score-diff">Decided by {matchup['score_diff']:.0f} {point_text}</div>
+                    </div>
+                    <div class="team-card {opponent_class}">
+                        <div class="team-name">
+                            {matchup['opponent_name']} {matchup['opponent_record']}
+                            <button class="expand-btn" onclick="toggleLineup('lineup-{i}')" title="View Lineups">📋</button>
+                        </div>
+                        <div class="team-score">{matchup['opponent_score']:.0f}</div>
+                        <div class="team-result">{matchup['opponent_result']}</div>
+                    </div>
+                    <div class="lineup-section" id="lineup-{i}" style="display: none;">
+                        <div style="display: flex; gap: 20px;">
+                            <div style="flex: 1;">
+                                <h4>{matchup['team_name']} - GW {current_lineup_gw} Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h4>
+                                {team_lineup_html}
+                            </div>
+                            <div style="flex: 1;">
+                                <h4>{matchup['opponent_name']} - GW {current_lineup_gw} Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h4>
+                                {opponent_lineup_html}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                """
+            
+            matchups_html += "</div>"
+        else:
+            matchups_html = "<p>Matchup data not available for this gameweek</p>"
+    else:
+        matchups_html = "<p>No gameweek data available</p>"
+
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -240,7 +542,38 @@ def main():
   <script>
     // Device detection and auto-redirect
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {{
-      window.location.href = 'football-mobile.html';
+      window.location.href = 'farmers-mobile.html';
+    }}
+    
+    function toggleLineup(lineupId) {{
+      var lineup = document.getElementById(lineupId);
+      if (lineup.style.display === "none" || lineup.style.display === "") {{
+        lineup.style.display = "block";
+      }} else {{
+        lineup.style.display = "none";
+      }}
+    }}
+    
+    function toggleSharedPlayers(button) {{
+      var lineupContainer = button.closest('.lineup-section');
+      if (!lineupContainer) lineupContainer = button.parentElement.parentElement;
+      var sharedPlayers = lineupContainer.querySelectorAll('.common-player');
+      var isHidden = button.style.opacity === '0.5';
+      
+      sharedPlayers.forEach(function(player) {{
+        var playerRow = player.closest('.player-row');
+        if (playerRow) {{
+          if (isHidden) {{
+            playerRow.style.display = 'block';
+            button.style.opacity = '1';
+            button.title = 'Hide Shared Players';
+          }} else {{
+            playerRow.style.display = 'none';
+            button.style.opacity = '0.5';
+            button.title = 'Show Shared Players';
+          }}
+        }}
+      }});
     }}
   </script>
   <style>
@@ -392,6 +725,215 @@ def main():
       margin-top: 0;
       margin-bottom: 1rem;
     }}
+    /* Matchups styling */
+    .matchups-container {{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      margin-top: 20px;
+    }}
+    .matchup-card {{
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 15px;
+    }}
+    .team-card {{
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+    }}
+    .team-card.win {{
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }}
+    .team-card.loss {{
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }}
+    .team-card.draw {{
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }}
+    .team-card.pending {{
+      border-color: #6b7280;
+      background: rgba(107, 114, 128, 0.1);
+    }}
+    
+    .expand-btn {{
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 5px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }}
+    
+    .expand-btn:hover {{
+      opacity: 1;
+    }}
+    
+    .lineup-section {{
+      grid-column: 1 / -1;
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid #e9ecef;
+    }}
+    
+    .lineup-container {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }}
+    
+    .position-group {{
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+    }}
+    
+    .position-group h5 {{
+      margin: 0 0 8px 0;
+      color: #495057;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }}
+    
+    .player-row {{
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      font-size: 14px;
+    }}
+    
+    .player-row.starter {{
+      background-color: rgba(255, 255, 255, 0.9);
+      border-left: 3px solid #28a745;
+      color: #333;
+    }}
+    
+    .player-row.bench {{
+      background-color: rgba(128, 128, 128, 0.6);
+      border-left: 3px solid #6c757d;
+      color: #fff;
+    }}
+    
+    .player-info {{
+      font-weight: 500;
+      width: 100%;
+    }}
+    
+    .captain-badge {{
+      background-color: #007bff;
+      color: white;
+      font-size: 10px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-weight: bold;
+      margin-left: 4px;
+    }}
+    
+    .captain-badge.effective {{
+      background-color: #28a745;
+    }}
+    
+    .captain-badge.vice {{
+      background-color: #6c757d;
+    }}
+    
+    .multiplier-badge {{
+      background-color: #dc3545;
+      color: white;
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-weight: bold;
+      margin-left: 3px;
+    }}
+    
+    .common-player {{
+      font-size: 14px;
+      margin-left: 4px;
+      color: #007bff;
+      font-weight: bold;
+    }}
+    .team-name {{
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: #3A083F;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }}
+    .team-score {{
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }}
+    .team-result {{
+      font-size: 0.8rem;
+      font-weight: bold;
+    }}
+    .vs-section {{
+      text-align: center;
+    }}
+    .vs-text {{
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #3A083F;
+      margin-bottom: 5px;
+    }}
+    .score-diff {{
+      font-size: 0.8rem;
+      color: #6b7280;
+      font-style: italic;
+    }}
+    
+    .shared-players-toggle {{
+      text-align: center;
+      margin: 10px 0 15px 0;
+    }}
+    
+    .compact-toggle-btn {{
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      margin-left: 8px;
+      border-radius: 4px;
+      transition: opacity 0.3s ease;
+      vertical-align: middle;
+    }}
+    
+    .compact-toggle-btn:hover {{
+      background: rgba(255,255,255,0.1);
+    }}
+    
+    .compact-toggle-btn:active {{
+      transform: scale(0.95);
+    }}
+    
+    .common-player {{
+      font-size: 14px;
+      margin-left: 4px;
+      color: #28a745;
+      font-weight: bold;
+    }}
   </style>
 </head>
 <body>
@@ -402,7 +944,7 @@ def main():
   
   <div style="text-align: center; margin-bottom: 2rem;">
     <a href="index.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; margin-right: 10px;">🏠 Home</a>
-    <a href="football-mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">Mobile Version</a>
+    <a href="farmers-mobile.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;">Mobile Version</a>
   </div>
 
   <div class="kpis">
@@ -443,6 +985,11 @@ def main():
   <div class="card">
     <h2 class="large-title">5 Week Form Table</h2>
     {form_table_html}
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">GW {most_recent_week} Matchups</h2>
+    {matchups_html}
   </div>
 
   <div class="muted">

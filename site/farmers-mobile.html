@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer's Football League 2025-2026 - Mobile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function toggleLineup(lineupId) {
+            var lineup = document.getElementById(lineupId);
+            if (lineup.style.display === "none" || lineup.style.display === "") {
+                lineup.style.display = "block";
+            } else {
+                lineup.style.display = "none";
+            }
+        }
+        
+        function toggleSharedPlayers(button) {
+            var lineupContainer = button.closest('.lineup-section');
+            if (!lineupContainer) lineupContainer = button.closest('.col-6');
+            var sharedPlayers = lineupContainer.querySelectorAll('.common-player');
+            var isHidden = button.style.opacity === '0.5';
+            
+            sharedPlayers.forEach(function(player) {
+                var playerRow = player.closest('.player-row');
+                if (playerRow) {
+                    if (isHidden) {
+                        playerRow.style.display = 'block';
+                        button.style.opacity = '1';
+                        button.title = 'Hide Shared Players';
+                    } else {
+                        playerRow.style.display = 'none';
+                        button.style.opacity = '0.5';
+                        button.title = 'Show Shared Players';
+                    }
+                }
+            });
+        }
+    </script>
+    <style>
+        :root {
+            --primary-purple: #3A083F;
+            --secondary-purple: #2d0631;
+            --light-purple: #d8b4fe;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+        
+        .hero-section {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .lineup-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .lineup-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .position-group {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px;
+            border-radius: 6px;
+        }
+        
+        .position-group h5 {
+            margin: 0 0 6px 0;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .player-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 6px 10px;
+            margin-bottom: 3px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .player-row.starter {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-left: 3px solid #28a745;
+            color: #333;
+        }
+        
+        .player-row.bench {
+            background-color: rgba(128, 128, 128, 0.6);
+            border-left: 3px solid #6c757d;
+            color: #fff;
+        }
+        
+        .player-info {
+            font-weight: 500;
+            width: 100%;
+        }
+        }
+        
+        .captain-badge {
+            background-color: #007bff;
+            color: white;
+            font-size: 8px;
+            padding: 1px 3px;
+            border-radius: 2px;
+            font-weight: bold;
+            margin-left: 3px;
+        }
+        
+        .captain-badge.effective {
+            background-color: #28a745;
+        }
+        
+        .captain-badge.vice {
+            background-color: #6c757d;
+        }
+        
+        .league-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            color: white;
+        }
+        
+        .logo {
+            height: 80px;
+            width: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--light-purple);
+        }
+        
+        .metric-title {
+            color: var(--primary-purple);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value {
+            color: #333;
+            font-size: 1rem;
+        }
+        
+        .content-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--light-purple);
+        }
+        
+        .section-title {
+            color: var(--primary-purple);
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            font-size: 0.8rem;
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .table tbody td {
+            color: #333;
+            border-color: #e5e7eb;
+            vertical-align: middle;
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 12px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .timestamp {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .league-title {
+                font-size: 1.5rem;
+            }
+            
+            .logo {
+                height: 60px;
+            }
+            
+            .table {
+                font-size: 0.8rem;
+            }
+            
+            .table thead th,
+            .table tbody td {
+                padding: 0.5rem 0.3rem;
+            }
+            
+            .content-card {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .metric-card {
+                padding: 1rem;
+            }
+        }
+        
+        /* Extra small screens */
+        @media (max-width: 576px) {
+            .table {
+                font-size: 0.75rem;
+            }
+            
+            .table thead th,
+            .table tbody td {
+                padding: 0.4rem 0.2rem;
+            }
+            
+            .league-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        .shared-players-toggle {
+            text-align: center;
+            margin: 10px 0 15px 0;
+        }
+        
+        .compact-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 2px 4px;
+            margin-left: 8px;
+            border-radius: 4px;
+            transition: opacity 0.3s ease;
+            vertical-align: middle;
+        }
+        
+        .compact-toggle-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .compact-toggle-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .common-player {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <img src="logo.PNG" alt="League Logo" class="logo">
+            <h1 class="league-title">Farmer's Football League 2025-2026</h1>
+            <div class="text-center mt-3">
+                <a href="index.html" class="btn btn-outline-light btn-sm me-2">🏠 Home</a>
+                <a href="farmers-desktop.html" class="btn btn-outline-light btn-sm">🖥️ View Desktop Version</a>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 col-12">
+                <div class="metric-card">
+                    <div class="metric-title">League Leader</div>
+                    <div class="metric-value">ChicagoFire</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="metric-card">
+                    <div class="metric-title">Last MoTM Champ</div>
+                    <div class="metric-value">Gabi-Gabi-Gabagool</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="metric-card">
+                    <div class="metric-title">Current MoTM Leader</div>
+                    <div class="metric-value">Momoney</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MoTM Standings -->
+        <div class="content-card">
+            <h2 class="section-title">Current MoTM Standings</h2>
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead class="sticky-top">
+                        <tr>
+                            <th scope="col" style="width: 25%;">Team Name</th><th scope="col" class="text-center">MoTM 7 Points</th><th scope="col" class="text-center">MoTM 7 Score</th><th scope="col" class="text-center">MoTM 7 Score Behind</th><th scope="col" class="text-center">Wk 21 Result</th><th scope="col" class="text-center">Wk 22 Result</th><th scope="col" class="text-center">Wk 23 Opponent Team</th><th scope="col" class="text-center">Wk 24 Opponent Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="fw-semibold">Momoney</td><td class="text-center">🟢 9</td><td class="text-center">174</td><td class="text-center">0</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">DropItLikeItsSlot</td><td class="text-center">FARTETA OUT</td></tr>
+<tr><td class="fw-semibold">C'mon you Whites!</td><td class="text-center">🟢 9</td><td class="text-center">155</td><td class="text-center">-19</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Praymaker</td><td class="text-center">ChicagoFire</td></tr>
+<tr><td class="fw-semibold">Bins FC</td><td class="text-center">🟢 9</td><td class="text-center">148</td><td class="text-center">-26</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Slotte Slutte</td><td class="text-center">Model Bangin Gits FC</td></tr>
+<tr><td class="fw-semibold">ChicagoFire</td><td class="text-center">🟡 7</td><td class="text-center">138</td><td class="text-center">-36</td><td class="text-center" style="color: orange; font-weight: bold;">D</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Berba Juniors</td><td class="text-center">C'mon you Whites!</td></tr>
+<tr><td class="fw-semibold">Gabi-Gabi-Gabagool!</td><td class="text-center">6</td><td class="text-center">147</td><td class="text-center">-27</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Ugarte be kidding me</td><td class="text-center">Praymaker</td></tr>
+<tr><td class="fw-semibold">FARTETA OUT</td><td class="text-center">6</td><td class="text-center">147</td><td class="text-center">-27</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">NYC Kopites</td><td class="text-center">Momoney</td></tr>
+<tr><td class="fw-semibold">Slotte Slutte</td><td class="text-center">6</td><td class="text-center">135</td><td class="text-center">-39</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Bins FC</td><td class="text-center">Saka Souffle</td></tr>
+<tr><td class="fw-semibold">NYC Kopites</td><td class="text-center">6</td><td class="text-center">127</td><td class="text-center">-47</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">FARTETA OUT</td><td class="text-center">Lambchester City</td></tr>
+<tr><td class="fw-semibold">Gunnersaurus</td><td class="text-center">4</td><td class="text-center">133</td><td class="text-center">-41</td><td class="text-center" style="color: orange; font-weight: bold;">D</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">kyle</td><td class="text-center">Spursy FC</td></tr>
+<tr><td class="fw-semibold">Minnows FC</td><td class="text-center">3</td><td class="text-center">153</td><td class="text-center">-21</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Lambchester City</td><td class="text-center">Ugarte be kidding me</td></tr>
+<tr><td class="fw-semibold">Ugarte be kidding me</td><td class="text-center">3</td><td class="text-center">148</td><td class="text-center">-26</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Gabi-Gabi-Gabagool!</td><td class="text-center">Minnows FC</td></tr>
+<tr><td class="fw-semibold">kyle</td><td class="text-center">3</td><td class="text-center">147</td><td class="text-center">-27</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Gunnersaurus</td><td class="text-center">Berba Juniors</td></tr>
+<tr><td class="fw-semibold">DropItLikeItsSlot</td><td class="text-center">3</td><td class="text-center">147</td><td class="text-center">-27</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Momoney</td><td class="text-center">Returning champs</td></tr>
+<tr><td class="fw-semibold">Lambchester City</td><td class="text-center">3</td><td class="text-center">137</td><td class="text-center">-37</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center">Minnows FC</td><td class="text-center">NYC Kopites</td></tr>
+<tr><td class="fw-semibold">Berba Juniors</td><td class="text-center">3</td><td class="text-center">135</td><td class="text-center">-39</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">ChicagoFire</td><td class="text-center">kyle</td></tr>
+<tr><td class="fw-semibold">Saka Souffle</td><td class="text-center">3</td><td class="text-center">135</td><td class="text-center">-39</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Spursy FC</td><td class="text-center">Slotte Slutte</td></tr>
+<tr><td class="fw-semibold">Model Bangin Gits FC</td><td class="text-center">3</td><td class="text-center">120</td><td class="text-center">-54</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Returning champs</td><td class="text-center">Bins FC</td></tr>
+<tr><td class="fw-semibold">Spursy FC</td><td class="text-center">3</td><td class="text-center">105</td><td class="text-center">-69</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Saka Souffle</td><td class="text-center">Gunnersaurus</td></tr>
+<tr><td class="fw-semibold">Praymaker</td><td class="text-center">0</td><td class="text-center">148</td><td class="text-center">-26</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">C'mon you Whites!</td><td class="text-center">Gabi-Gabi-Gabagool!</td></tr>
+<tr><td class="fw-semibold">Returning champs</td><td class="text-center">0</td><td class="text-center">127</td><td class="text-center">-47</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center">Model Bangin Gits FC</td><td class="text-center">DropItLikeItsSlot</td></tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- League Standings -->
+        <div class="content-card">
+            <h2 class="section-title">League Standings</h2>
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead class="sticky-top">
+                        <tr>
+                            <th scope="col" class="text-center" style="width: 8%;">Rank</th><th scope="col" class="text-center" style="width: 8%;">Playoff</th><th scope="col" style="width: 30%;">Team Name</th><th scope="col" class="text-center">Total Score</th><th scope="col" class="text-center">Total Points</th><th scope="col" class="text-center">W</th><th scope="col" class="text-center">D</th><th scope="col" class="text-center">L</th><th scope="col" class="text-center">Total FFPts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="text-center fw-bold">1</td><td class="text-center">🏆</td><td class="fw-semibold">ChicagoFire</td><td class="text-center">1363</td><td class="text-center">52</td><td class="text-center">17</td><td class="text-center">1</td><td class="text-center">5</td><td class="text-center">80</td></tr>
+<tr><td class="text-center fw-bold">2</td><td class="text-center">⭐</td><td class="fw-semibold">Berba Juniors</td><td class="text-center">1333</td><td class="text-center">48</td><td class="text-center">16</td><td class="text-center">0</td><td class="text-center">7</td><td class="text-center">79</td></tr>
+<tr><td class="text-center fw-bold">3</td><td class="text-center">⭐</td><td class="fw-semibold">Momoney</td><td class="text-center">1346</td><td class="text-center">42</td><td class="text-center">14</td><td class="text-center">0</td><td class="text-center">9</td><td class="text-center">83</td></tr>
+<tr><td class="text-center fw-bold">4</td><td class="text-center">⭐</td><td class="fw-semibold">Gunnersaurus</td><td class="text-center">1278</td><td class="text-center">40</td><td class="text-center">13</td><td class="text-center">1</td><td class="text-center">9</td><td class="text-center">76</td></tr>
+<tr><td class="text-center fw-bold">5</td><td class="text-center">⭐</td><td class="fw-semibold">NYC Kopites</td><td class="text-center">1217</td><td class="text-center">39</td><td class="text-center">13</td><td class="text-center">0</td><td class="text-center">10</td><td class="text-center">65</td></tr>
+<tr><td class="text-center fw-bold">6</td><td class="text-center">⭐</td><td class="fw-semibold">Gabi-Gabi-Gabagool!</td><td class="text-center">1317</td><td class="text-center">37</td><td class="text-center">12</td><td class="text-center">1</td><td class="text-center">10</td><td class="text-center">82</td></tr>
+<tr><td class="text-center fw-bold">7</td><td class="text-center">⭐</td><td class="fw-semibold">Saka Souffle</td><td class="text-center">1316</td><td class="text-center">37</td><td class="text-center">12</td><td class="text-center">1</td><td class="text-center">10</td><td class="text-center">79</td></tr>
+<tr><td class="text-center fw-bold">8</td><td class="text-center">⭐</td><td class="fw-semibold">Lambchester City</td><td class="text-center">1267</td><td class="text-center">37</td><td class="text-center">12</td><td class="text-center">1</td><td class="text-center">10</td><td class="text-center">75</td></tr>
+<tr><td class="text-center fw-bold">9</td><td class="text-center"></td><td class="fw-semibold">Ugarte be kidding me</td><td class="text-center">1260</td><td class="text-center">37</td><td class="text-center">12</td><td class="text-center">1</td><td class="text-center">10</td><td class="text-center">75</td></tr>
+<tr><td class="text-center fw-bold">10</td><td class="text-center"></td><td class="fw-semibold">FARTETA OUT</td><td class="text-center">1252</td><td class="text-center">37</td><td class="text-center">12</td><td class="text-center">1</td><td class="text-center">10</td><td class="text-center">71</td></tr>
+<tr><td class="text-center fw-bold">11</td><td class="text-center"></td><td class="fw-semibold">C'mon you Whites!</td><td class="text-center">1245</td><td class="text-center">36</td><td class="text-center">12</td><td class="text-center">0</td><td class="text-center">11</td><td class="text-center">72</td></tr>
+<tr><td class="text-center fw-bold">12</td><td class="text-center"></td><td class="fw-semibold">Bins FC</td><td class="text-center">1258</td><td class="text-center">35</td><td class="text-center">11</td><td class="text-center">2</td><td class="text-center">10</td><td class="text-center">76</td></tr>
+<tr><td class="text-center fw-bold">13</td><td class="text-center"></td><td class="fw-semibold">Slotte Slutte</td><td class="text-center">1168</td><td class="text-center">34</td><td class="text-center">11</td><td class="text-center">1</td><td class="text-center">11</td><td class="text-center">61</td></tr>
+<tr><td class="text-center fw-bold">14</td><td class="text-center"></td><td class="fw-semibold">kyle</td><td class="text-center">1171</td><td class="text-center">30</td><td class="text-center">10</td><td class="text-center">0</td><td class="text-center">13</td><td class="text-center">62</td></tr>
+<tr><td class="text-center fw-bold">15</td><td class="text-center"></td><td class="fw-semibold">Returning champs</td><td class="text-center">1173</td><td class="text-center">27</td><td class="text-center">9</td><td class="text-center">0</td><td class="text-center">14</td><td class="text-center">60</td></tr>
+<tr><td class="text-center fw-bold">16</td><td class="text-center"></td><td class="fw-semibold">Minnows FC</td><td class="text-center">1224</td><td class="text-center">24</td><td class="text-center">8</td><td class="text-center">0</td><td class="text-center">15</td><td class="text-center">72</td></tr>
+<tr><td class="text-center fw-bold">17</td><td class="text-center"></td><td class="fw-semibold">Spursy FC</td><td class="text-center">1106</td><td class="text-center">24</td><td class="text-center">8</td><td class="text-center">0</td><td class="text-center">15</td><td class="text-center">55</td></tr>
+<tr><td class="text-center fw-bold">18</td><td class="text-center"></td><td class="fw-semibold">Model Bangin Gits FC</td><td class="text-center">1208</td><td class="text-center">23</td><td class="text-center">7</td><td class="text-center">2</td><td class="text-center">14</td><td class="text-center">64</td></tr>
+<tr><td class="text-center fw-bold">19</td><td class="text-center"></td><td class="fw-semibold">DropItLikeItsSlot</td><td class="text-center">1194</td><td class="text-center">23</td><td class="text-center">7</td><td class="text-center">2</td><td class="text-center">14</td><td class="text-center">64</td></tr>
+<tr><td class="text-center fw-bold">20</td><td class="text-center"></td><td class="fw-semibold">Praymaker</td><td class="text-center">1131</td><td class="text-center">21</td><td class="text-center">7</td><td class="text-center">0</td><td class="text-center">16</td><td class="text-center">58</td></tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="content-card">
+            <h2 class="section-title">Total Points by Team</h2>
+            <div class="chart-container">
+                <html>
+<head><meta charset="utf-8" /></head>
+<body>
+    <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.1.min.js" integrity="sha256-4rD3fugVb/nVJYUv5Ky3v+fYXoouHaBSP20WIJuEiWg=" crossorigin="anonymous"></script>                <div id="points-chart" class="plotly-graph-div" style="height:700px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("points-chart")) {                    Plotly.newPlot(                        "points-chart",                        [{"hovertemplate":"Total Points=%{text}\u003cbr\u003eTeam Name=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#3A083F","pattern":{"shape":""}},"name":"","orientation":"h","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAAAANUAAAAAAAAA3QAAAAAAAADdAAAAAAAAAOEAAAAAAAAA4QAAAAAAAADtAAAAAAAAAPkAAAAAAAABBQAAAAAAAgEFAAAAAAAAAQkAAAAAAAIBCQAAAAAAAgEJAAAAAAACAQkAAAAAAAIBCQAAAAAAAgEJAAAAAAACAQ0AAAAAAAABEQAAAAAAAAEVAAAAAAAAASEAAAAAAAABKQA=="},"textposition":"outside","x":{"dtype":"i1","bdata":"FRcXGBgbHiIjJCUlJSUlJygqMDQ="},"xaxis":"x","y":["Praymaker","Model Bangin Gits FC","DropItLikeItsSlot","Spursy FC","Minnows FC","Returning champs","kyle","Slotte Slutte","Bins FC","C'mon you Whites!","FARTETA OUT","Lambchester City","Saka Souffle","Gabi-Gabi-Gabagool!","Ugarte be kidding me","NYC Kopites","Gunnersaurus","Momoney","Berba Juniors","ChicagoFire"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Total Points"},"range":[0,59.8]},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{},"tickfont":{"size":11},"showticklabels":true},"legend":{"tracegroupgap":0},"margin":{"t":15,"l":160,"r":15,"b":15},"barmode":"relative","font":{"family":"system-ui, -apple-system, Segoe UI, Roboto, sans-serif"},"height":700,"plot_bgcolor":"rgba(0,0,0,0)","paper_bgcolor":"rgba(0,0,0,0)","showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+</body>
+</html>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Latest Gameweek (GW23) Results</h2>
+            <div class="chart-container">
+                <html>
+<head><meta charset="utf-8" /></head>
+<body>
+    <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.1.min.js" integrity="sha256-4rD3fugVb/nVJYUv5Ky3v+fYXoouHaBSP20WIJuEiWg=" crossorigin="anonymous"></script>                <div id="gameweek-chart" class="plotly-graph-div" style="height:700px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("gameweek-chart")) {                    Plotly.newPlot(                        "gameweek-chart",                        [{"hovertemplate":"Score=%{text}\u003cbr\u003eTeam Name=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":["red","red","red","green","red","red","red","green","red","green","red","red","green","green","red","green","green","green","green","green"],"pattern":{"shape":""}},"name":"","orientation":"h","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAAAAPEAAAAAAAABAQAAAAAAAAEFAAAAAAACAQUAAAAAAAABCQAAAAAAAgEJAAAAAAAAAQ0AAAAAAAABDQAAAAAAAgENAAAAAAACAREAAAAAAAABFQAAAAAAAAEdAAAAAAAAAR0AAAAAAAIBHQAAAAAAAgEdAAAAAAACASEAAAAAAAABJQAAAAAAAgElAAAAAAACASkAAAAAAAABOQA=="},"textposition":"outside","x":{"dtype":"i1","bdata":"HCAiIyQlJiYnKSouLi8vMTIzNTw="},"xaxis":"x","y":["Saka Souffle","NYC Kopites","Gunnersaurus","FARTETA OUT","Slotte Slutte","Returning champs","Berba Juniors","Spursy FC","Ugarte be kidding me","ChicagoFire","DropItLikeItsSlot","Lambchester City","Gabi-Gabi-Gabagool!","Model Bangin Gits FC","Praymaker","C'mon you Whites!","kyle","Momoney","Bins FC","Minnows FC"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Score"},"range":[0,69.0]},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{},"tickfont":{"size":11},"showticklabels":true},"legend":{"tracegroupgap":0},"margin":{"t":15,"l":160,"r":15,"b":15},"barmode":"relative","font":{"family":"system-ui, -apple-system, Segoe UI, Roboto, sans-serif"},"height":700,"showlegend":false,"plot_bgcolor":"rgba(0,0,0,0)","paper_bgcolor":"rgba(0,0,0,0)"},                        {"responsive": true}                    )                };            </script>        </div>
+</body>
+</html>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">5 Week Form Table</h2>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-center" style="width: 8%;">Rank</th><th scope="col" class="text-center" style="width: 8%;">5 Week Rank</th><th scope="col" style="width: 25%;">Team Name</th><th scope="col" class="text-center">5 Week Score</th><th scope="col" class="text-center">Behind 5 Week High</th><th scope="col" class="text-center">Wk 19 Result</th><th scope="col" class="text-center">Wk 20 Result</th><th scope="col" class="text-center">Wk 21 Result</th><th scope="col" class="text-center">Wk 22 Result</th><th scope="col" class="text-center">Wk 23 Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="text-center">3</td><td class="text-center">1</td><td>Momoney</td><td class="text-center">283</td><td class="text-center">0</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">6</td><td class="text-center">2</td><td>Gabi-Gabi-Gabagool!</td><td class="text-center">261</td><td class="text-center">22</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">16</td><td class="text-center">3</td><td>Minnows FC</td><td class="text-center">257</td><td class="text-center">26</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">11</td><td class="text-center">4</td><td>C'mon you Whites!</td><td class="text-center">248</td><td class="text-center">35</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">10</td><td class="text-center">5</td><td>FARTETA OUT</td><td class="text-center">245</td><td class="text-center">38</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">12</td><td class="text-center">6</td><td>Bins FC</td><td class="text-center">242</td><td class="text-center">41</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">14</td><td class="text-center">7</td><td>kyle</td><td class="text-center">240</td><td class="text-center">43</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">9</td><td class="text-center">8</td><td>Ugarte be kidding me</td><td class="text-center">239</td><td class="text-center">44</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">7</td><td class="text-center">9</td><td>Saka Souffle</td><td class="text-center">236</td><td class="text-center">47</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">19</td><td class="text-center">10</td><td>DropItLikeItsSlot</td><td class="text-center">235</td><td class="text-center">48</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">1</td><td class="text-center">11</td><td>ChicagoFire</td><td class="text-center">230</td><td class="text-center">53</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: #DAA520; font-weight: bold;">D</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">5</td><td class="text-center">12</td><td>NYC Kopites</td><td class="text-center">228</td><td class="text-center">55</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">20</td><td class="text-center">13</td><td>Praymaker</td><td class="text-center">224</td><td class="text-center">59</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">8</td><td class="text-center">14</td><td>Lambchester City</td><td class="text-center">222</td><td class="text-center">61</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">2</td><td class="text-center">15</td><td>Berba Juniors</td><td class="text-center">220</td><td class="text-center">63</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">4</td><td class="text-center">16</td><td>Gunnersaurus</td><td class="text-center">217</td><td class="text-center">66</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: #DAA520; font-weight: bold;">D</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">18</td><td class="text-center">17</td><td>Model Bangin Gits FC</td><td class="text-center">202</td><td class="text-center">81</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+<tr><td class="text-center">13</td><td class="text-center">18</td><td>Slotte Slutte</td><td class="text-center">201</td><td class="text-center">82</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: green; font-weight: bold;">W</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">15</td><td class="text-center">19</td><td>Returning champs</td><td class="text-center">185</td><td class="text-center">98</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td></tr>
+<tr><td class="text-center">17</td><td class="text-center">20</td><td>Spursy FC</td><td class="text-center">169</td><td class="text-center">114</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: red; font-weight: bold;">L</td><td class="text-center" style="color: green; font-weight: bold;">W</td></tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- GW Matchups -->
+        <div class="container-fluid my-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-center mb-3" style="color: #3A083F;">GW 23 Matchups</h3>
+                    <div class="row g-3">
+                        
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">C'mon you Whites!</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-0')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">12-0-11</div>
+                                            <div class="h4 mb-1">49</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 2 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Praymaker</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-0')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">7-0-16</div>
+                                            <div class="h4 mb-1">47</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-0" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>C'mon you Whites! - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Bowen - FWD - 12 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rogers - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Roefs - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Gravenberch - MID - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Alderete - DEF - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts <span class='common-player'>🤝</span></span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Praymaker - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>João Pedro - FWD - 12 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rogers - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rodon - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Van Hecke - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Foden - MID - 1 pts <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Woltemade - FWD - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Sánchez - GKP - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Reijnders - MID - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Keane - DEF - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts <span class='common-player'>🤝</span></span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">ChicagoFire</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-1')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">17-1-5</div>
+                                            <div class="h4 mb-1">41</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 3 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Berba Juniors</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-1')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">16-0-7</div>
+                                            <div class="h4 mb-1">38</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-1" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>ChicagoFire - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Enzo - MID - 8 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Sánchez - GKP - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ndiaye - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts <span class='common-player'>🤝</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>B.Fernandes - MID - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Calvert-Lewin - FWD - 2 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Berba Juniors - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Saka - MID - 2 pts <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Verbruggen - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Foden - MID - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>O'Reilly - DEF - 6 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Marc Guiu - FWD - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">NYC Kopites</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-2')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">13-0-10</div>
+                                            <div class="h4 mb-1">32</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 3 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">FARTETA OUT</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-2')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">12-1-10</div>
+                                            <div class="h4 mb-1">35</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-2" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>NYC Kopites - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Virgil - DEF - 9 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Reijnders - MID - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Raya - GKP - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Van Hecke - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Alderete - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts <span class='captain-badge vice'>VC</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Enzo - MID - 8 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Grealish - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>FARTETA OUT - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Mukiele - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 4 pts <span class='captain-badge vice'>VC</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cherki - MID - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Raya - GKP - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Lacroix - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Woltemade - FWD - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Estève - DEF - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Gabi-Gabi-Gabagool!</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-3')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">12-1-10</div>
+                                            <div class="h4 mb-1">46</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 7 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Ugarte be kidding me</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-3')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">12-1-10</div>
+                                            <div class="h4 mb-1">39</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-3" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Gabi-Gabi-Gabagool! - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Virgil - DEF - 9 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Enzo - MID - 8 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Leno - GKP - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Alderete - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Valdimarsson - GKP - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Hincapie - DEF - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Ugarte be kidding me - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Bowen - FWD - 12 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Pickford - GKP - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Senesi - DEF - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ballard - DEF - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Hall - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gravenberch - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Guéhi - DEF - 6 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Sánchez - GKP - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Kudus - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Momoney</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-4')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">14-0-9</div>
+                                            <div class="h4 mb-1">51</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 9 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">DropItLikeItsSlot</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-4')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">7-2-14</div>
+                                            <div class="h4 mb-1">42</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-4" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Momoney - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ndiaye - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Raya - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>B.Fernandes - MID - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Mukiele - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Estève - DEF - 3 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>DropItLikeItsSlot - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Mukiele - DEF - 4 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Pickford - GKP - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts <span class='common-player'>🤝</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>King - MID - 4 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Dewsbury-Hall - MID - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Saka Souffle</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-5')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">12-1-10</div>
+                                            <div class="h4 mb-1">28</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 10 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Spursy FC</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-5')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">8-0-15</div>
+                                            <div class="h4 mb-1">38</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-5" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Saka Souffle - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Andersen - DEF - 8 pts ⭐ <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Enzo - MID - 8 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>E.Le Fée - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Raya - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiaw - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Foden - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dorgu - DEF - 8 pts ⭐</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Spursy FC - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>João Pedro - FWD - 12 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Virgil - DEF - 9 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cucurella - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Reijnders - MID - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Mitoma - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Iwobi - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>A.Becker - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Pedro Porro - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Muñoz - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gyökeres - FWD - 1 pts <span class='captain-badge vice'>VC</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dennis - GKP - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Gvardiol - DEF - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>P.M.Sarr - MID - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Kudus - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Returning champs</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-6')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">9-0-14</div>
+                                            <div class="h4 mb-1">37</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 10 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Model Bangin Gits FC</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-6')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">7-2-14</div>
+                                            <div class="h4 mb-1">47</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-6" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Returning champs - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Virgil - DEF - 9 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cash - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Mukiele - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Wirtz - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Kelleher - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Hall - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Foden - MID - 1 pts <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Woltemade - FWD - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Anderson - MID - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Heaven - DEF - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Model Bangin Gits FC - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Szoboszlai - MID - 13 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Virgil - DEF - 9 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Enzo - MID - 8 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Semenyo - MID - 8 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Senesi - DEF - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cherki - MID - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Petrović - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Saliba - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Mateta - FWD - 2 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Verbruggen - GKP - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Collins - DEF - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Alderete - DEF - 1 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Lambchester City</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-7')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">12-1-10</div>
+                                            <div class="h4 mb-1">46</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 14 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Minnows FC</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-7')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">8-0-15</div>
+                                            <div class="h4 mb-1">60</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-7" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Lambchester City - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Rogers - MID - 8 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Watkins - FWD - 8 pts ⭐ <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Van de Ven - DEF - 7 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Konsa - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Anderson - MID - 5 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Pickford - GKP - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cherki - MID - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>B.Fernandes - MID - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Estève - DEF - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Kinsky - GKP - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Keane - DEF - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Minnows FC - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 20 pts ⭐ <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Bowen - FWD - 12 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Romero - DEF - 11 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cash - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>A.Becker - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gabriel - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Gravenberch - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 1 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Semenyo - MID - 8 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Reijnders - MID - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Raya - GKP - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Gunnersaurus</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-8')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">13-1-9</div>
+                                            <div class="h4 mb-1">34</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 16 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">kyle</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-8')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">10-0-13</div>
+                                            <div class="h4 mb-1">50</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-8" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Gunnersaurus - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Enzo - MID - 8 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Van de Ven - DEF - 7 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Tarkowski - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ndiaye - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Raya - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rice - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Woltemade - FWD - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts <span class='captain-badge vice'>VC</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Xhaka - MID - 0 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Bruno G. - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>kyle - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rogers - MID - 8 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Van de Ven - DEF - 7 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>James - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>L.Miley - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Mateta - FWD - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Kelleher - GKP - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Sels - GKP - 6 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Gabriel - DEF - 1 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Palmer - MID - 0 pts <span class='captain-badge vice'>VC</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>J.Palhinha - MID - 0 pts</span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-4">
+                                    <div class="card border-success bg-success bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Bins FC</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-9')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">11-2-10</div>
+                                            <div class="h4 mb-1">53</div>
+                                            <div class="badge bg-dark">W</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="fw-bold text-primary mb-1">VS</div>
+                                    <small class="text-muted">Decided by 17 pts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card border-danger bg-danger bg-opacity-10 border-opacity-50">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="fw-bold" style="font-size: 0.75rem;">Slotte Slutte</div>
+                                                <button class="btn btn-sm p-0" onclick="toggleLineup('mobile-lineup-9')" style="font-size: 0.7rem;">📋</button>
+                                            </div>
+                                            <div class="text-muted mb-1" style="font-size: 0.65rem;">11-1-11</div>
+                                            <div class="h4 mb-1">36</div>
+                                            <div class="badge bg-dark">L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lineup-section" id="mobile-lineup-9" style="display: none; margin-top: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6>Bins FC - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>João Pedro - FWD - 12 pts ⭐</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Rogers - MID - 8 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Guéhi - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Dúbravka - GKP - 5 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Chalobah - DEF - 4 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Wirtz - MID - 2 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='captain-badge vice'>VC</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Foden - MID - 1 pts</span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Andersen - DEF - 8 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Neto - MID - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Petrović - GKP - 1 pts</span>
+            </div></div></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6>Slotte Slutte - GW 23 Lineup <button onclick='toggleSharedPlayers(this)' class='compact-toggle-btn' title='Hide/Show Shared Players'>🤝</button></h6>
+                                        <div class='lineup-container'><div class='lineup-group'><h5 style='color: #28a745; margin-bottom: 10px;'>STARTERS</h5><div class='player-row starter'>
+                <span class='player-info'>Wilson - MID - 10 pts ⭐ <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>James - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>O'Reilly - DEF - 6 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Cherki - MID - 3 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Neto - MID - 3 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Haaland - FWD - 2 pts <span class='captain-badge'>C</span> <span class='multiplier-badge'>×2</span> <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Thiago - FWD - 2 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Raya - GKP - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>J.Timber - DEF - 1 pts <span class='common-player'>🤝</span></span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Zubimendi - MID - 1 pts</span>
+            </div><div class='player-row starter'>
+                <span class='player-info'>Ekitiké - FWD - 1 pts <span class='captain-badge vice'>VC</span></span>
+            </div></div><div class='lineup-group'><h5 style='color: #6c757d; margin-bottom: 10px; margin-top: 15px;'>BENCH</h5><div class='player-row bench'>
+                <span class='player-info'>Cunha - MID - 9 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Dorgu - DEF - 8 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Pope - GKP - 3 pts</span>
+            </div><div class='player-row bench'>
+                <span class='player-info'>Senesi - DEF - 3 pts <span class='common-player'>🤝</span></span>
+            </div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            Generated at: 2026-01-27 03:46:35.849586+00:00 UTC
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
