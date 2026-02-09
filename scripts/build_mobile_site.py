@@ -612,16 +612,19 @@ def main():
                 top_scorers_rows = ""
                 for rank, (_, row) in enumerate(player_stats.iterrows(), 1):
                     captain_display = '⭐ C' if row['Captain'] == 'Captain' else ''
-                    top_scorers_rows += f'<tr><td class="text-center">{rank}</td><td class="text-center">{row["Player"]}</td><td class="text-center">{row["Position Type"]}</td><td class="text-center">{int(row["Score"])}</td><td class="text-center">{row["TeamList"]}</td><td class="text-center">{row["Role"]}</td><td class="text-center">{captain_display}</td></tr>\n'
+                    top_scorers_rows += f'<tr><td class="text-center">{rank}</td><td class="text-center">{row["Player"]}</td><td class="text-center">{row["Position Type"]}</td><td class="text-center">{int(row["Score"])}</td><td class="text-center" style="min-width: 250px; white-space: normal;">{row["TeamList"]}</td><td class="text-center">{row["Role"]}</td><td class="text-center">{captain_display}</td></tr>\n'
 
     # Load Manager of the Month Schedule
     try:
         motm_schedule_df = pd.read_excel(ROOT / "data" / "motm_schedule.xlsx")
-        # Convert MoTM column to clean text (remove .0 decimals, keep NaN as empty)
+        # Convert MoTM column to clean text (remove .0 decimals, keep NaN as 'None')
         if 'MoTM' in motm_schedule_df.columns:
             motm_schedule_df['MoTM'] = motm_schedule_df['MoTM'].apply(
                 lambda x: str(int(x)) if pd.notna(x) and isinstance(x, float) and x == int(x) else ('None' if pd.isna(x) else str(x))
             )
+        # Clean NaN in Winner column
+        if 'Winner' in motm_schedule_df.columns:
+            motm_schedule_df['Winner'] = motm_schedule_df['Winner'].fillna('TBD')
 
         # Determine current MoTM row based on most_recent_week
         def is_current_motm_row(row):
@@ -647,6 +650,43 @@ def main():
     except FileNotFoundError:
         motm_schedule_headers = "<th>No Data</th>"
         motm_schedule_rows = "<tr><td>MoTM Schedule data not available</td></tr>"
+
+    # Build Full League Table with weekly results
+    full_league_cols = ['Rank', 'Team Name', 'Total Points', 'Total Score', 'W', 'D', 'L']
+    for wk in range(1, most_recent_week + 1):
+        result_col = f'Wk {wk} Result'
+        if result_col in df.columns:
+            full_league_cols.append(result_col)
+    available_full_cols = [c for c in full_league_cols if c in df.columns]
+    full_df = df[available_full_cols].sort_values('Rank')
+    full_league_headers = ""
+    for col in available_full_cols:
+        display_col = col.replace(' Result', '') if 'Result' in col else col
+        if col == 'Team Name':
+            full_league_headers += f'<th scope="col" style="min-width: 140px; position: sticky; left: 0; z-index: 2; background: inherit;">{display_col}</th>'
+        elif 'Result' in col:
+            full_league_headers += f'<th scope="col" class="text-center" style="min-width: 50px; white-space: nowrap;">{display_col}</th>'
+        else:
+            full_league_headers += f'<th scope="col" class="text-center" style="white-space: nowrap;">{display_col}</th>'
+    full_league_rows = ""
+    for _, row in full_df.iterrows():
+        cells = ""
+        for col in available_full_cols:
+            val = row[col]
+            if 'Result' in col:
+                if val == 'W':
+                    cells += f'<td class="text-center" style="color: green; font-weight: bold;">{val}</td>'
+                elif val == 'D':
+                    cells += f'<td class="text-center" style="color: #DAA520; font-weight: bold;">{val}</td>'
+                elif val == 'L':
+                    cells += f'<td class="text-center" style="color: red; font-weight: bold;">{val}</td>'
+                else:
+                    cells += f'<td class="text-center">{val}</td>'
+            elif col == 'Team Name':
+                cells += f'<td>{val}</td>'
+            else:
+                cells += f'<td class="text-center">{val}</td>'
+        full_league_rows += f'<tr>{cells}</tr>\n'
 
     # Create column headers for table
     table_headers = ""
@@ -1097,15 +1137,30 @@ def main():
         <!-- Manager of the Month Schedule -->
         <div class="content-card">
             <h2 class="section-title">Manager of the Month Schedule</h2>
+            <table class="table table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        {motm_schedule_headers}
+                    </tr>
+                </thead>
+                <tbody>
+                    {motm_schedule_rows}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Full League Table -->
+        <div class="content-card">
+            <h2 class="section-title">Full League Table</h2>
             <div class="table-responsive">
                 <table class="table table-sm">
                     <thead class="table-dark">
                         <tr>
-                            {motm_schedule_headers}
+                            {full_league_headers}
                         </tr>
                     </thead>
                     <tbody>
-                        {motm_schedule_rows}
+                        {full_league_rows}
                     </tbody>
                 </table>
             </div>

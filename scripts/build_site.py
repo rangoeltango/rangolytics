@@ -546,22 +546,25 @@ def main():
                 ).reset_index()
                 player_stats = player_stats.sort_values('Score', ascending=False).head(20)
                 # Build table
-                top_scorers_html = "<table class='motm-schedule-table' border='0'><thead><tr>"
-                top_scorers_html += "<th>Rank</th><th>Player</th><th>Position</th><th>Score</th><th>Teams</th><th>Role</th><th>Captain</th>"
+                top_scorers_html = "<table class='top-scorers-table' border='0'><thead><tr>"
+                top_scorers_html += "<th>Rank</th><th>Player</th><th>Position</th><th>Score</th><th class='teams-col'>Teams</th><th>Role</th><th>Captain</th>"
                 top_scorers_html += "</tr></thead><tbody>"
                 for rank, (_, row) in enumerate(player_stats.iterrows(), 1):
                     captain_display = '⭐ C' if row['Captain'] == 'Captain' else ''
-                    top_scorers_html += f"<tr><td>{rank}</td><td>{row['Player']}</td><td>{row['Position Type']}</td><td>{int(row['Score'])}</td><td>{row['TeamList']}</td><td>{row['Role']}</td><td>{captain_display}</td></tr>"
+                    top_scorers_html += f"<tr><td>{rank}</td><td>{row['Player']}</td><td>{row['Position Type']}</td><td>{int(row['Score'])}</td><td class='teams-col'>{row['TeamList']}</td><td>{row['Role']}</td><td>{captain_display}</td></tr>"
                 top_scorers_html += "</tbody></table>"
 
     # Load Manager of the Month Schedule
     try:
         motm_schedule_df = pd.read_excel(ROOT / "data" / "motm_schedule.xlsx")
-        # Convert MoTM column to clean text (remove .0 decimals, keep NaN as empty)
+        # Convert MoTM column to clean text (remove .0 decimals, keep NaN as 'None')
         if 'MoTM' in motm_schedule_df.columns:
             motm_schedule_df['MoTM'] = motm_schedule_df['MoTM'].apply(
                 lambda x: str(int(x)) if pd.notna(x) and isinstance(x, float) and x == int(x) else ('None' if pd.isna(x) else str(x))
             )
+        # Clean NaN in Winner column
+        if 'Winner' in motm_schedule_df.columns:
+            motm_schedule_df['Winner'] = motm_schedule_df['Winner'].fillna('TBD')
 
         # Determine current MoTM row based on most_recent_week
         def is_current_motm_row(row):
@@ -588,6 +591,38 @@ def main():
         motm_schedule_table_html += "</tbody></table>"
     except FileNotFoundError:
         motm_schedule_table_html = "<p>MoTM Schedule data not available</p>"
+
+    # Build Full League Table with weekly results
+    full_league_cols = ['Rank', 'Team Name', 'Total Points', 'Total Score', 'W', 'D', 'L']
+    # Add Wk N Result columns up to most_recent_week
+    for wk in range(1, most_recent_week + 1):
+        result_col = f'Wk {wk} Result'
+        if result_col in df.columns:
+            full_league_cols.append(result_col)
+    available_full_cols = [c for c in full_league_cols if c in df.columns]
+    full_df = df[available_full_cols].sort_values('Rank')
+    full_league_table_html = "<table class='full-league-table' border='0'><thead><tr>"
+    for col in available_full_cols:
+        display_col = col.replace(' Result', '') if 'Result' in col else col
+        full_league_table_html += f"<th>{display_col}</th>"
+    full_league_table_html += "</tr></thead><tbody>"
+    for _, row in full_df.iterrows():
+        full_league_table_html += "<tr>"
+        for col in available_full_cols:
+            val = row[col]
+            if 'Result' in col:
+                if val == 'W':
+                    full_league_table_html += f'<td style="color: green; font-weight: bold;">{val}</td>'
+                elif val == 'D':
+                    full_league_table_html += f'<td style="color: #DAA520; font-weight: bold;">{val}</td>'
+                elif val == 'L':
+                    full_league_table_html += f'<td style="color: red; font-weight: bold;">{val}</td>'
+                else:
+                    full_league_table_html += f'<td>{val}</td>'
+            else:
+                full_league_table_html += f'<td>{val}</td>'
+        full_league_table_html += "</tr>"
+    full_league_table_html += "</tbody></table>"
 
     html = f"""<!doctype html>
 <html lang="en">
@@ -728,12 +763,63 @@ def main():
     }}
     
     /* MoTM Schedule table styling */
+    .motm-schedule-table {{
+      display: table;
+      max-height: none;
+      overflow: visible;
+    }}
     .motm-schedule-table th, .motm-schedule-table td {{
       text-align: center;
     }}
     tr.current-motm td {{
       background: #d4edda !important;
       font-weight: bold;
+    }}
+    /* Top Scorers table styling */
+    .top-scorers-table {{
+      table-layout: fixed;
+    }}
+    .top-scorers-table th, .top-scorers-table td {{
+      text-align: center;
+    }}
+    .top-scorers-table .teams-col {{
+      width: 40%;
+      white-space: normal;
+      word-wrap: break-word;
+    }}
+    /* Full League Table styling */
+    .full-league-wrapper {{
+      overflow-x: auto;
+      max-height: none;
+    }}
+    .full-league-table {{
+      display: table !important;
+      max-height: none;
+      overflow: visible;
+      min-width: 2200px;
+      table-layout: auto !important;
+    }}
+    .full-league-table thead, .full-league-table tbody {{
+      display: table-header-group;
+      width: auto;
+      table-layout: auto;
+    }}
+    .full-league-table tbody {{
+      display: table-row-group;
+    }}
+    .full-league-table th, .full-league-table td {{
+      text-align: center;
+      white-space: nowrap;
+      padding: 8px 10px;
+      width: auto !important;
+    }}
+    .full-league-table td:nth-child(2) {{
+      text-align: left;
+      min-width: 200px;
+    }}
+    .full-league-table th:nth-child(2) {{
+      text-align: left;
+      min-width: 200px;
     }}
     
     /* Form table styling - Team Name is 3rd column */
@@ -1065,6 +1151,13 @@ def main():
   <div class="card">
     <h2 class="large-title">Manager of the Month Schedule</h2>
     {motm_schedule_table_html}
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Full League Table</h2>
+    <div class="full-league-wrapper">
+    {full_league_table_html}
+    </div>
   </div>
 
   <div class="muted">
