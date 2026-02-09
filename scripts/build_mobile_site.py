@@ -580,6 +580,74 @@ def main():
     else:
         matchups_html = '<div class="alert alert-info">No gameweek data available</div>'
 
+    # Build Top Scorers of the Week from lineup data
+    top_scorers_headers = "<th>No Data</th>"
+    top_scorers_rows = "<tr><td>No lineup data available</td></tr>"
+    if lineup_df is not None:
+        current_lineup_gw = get_current_lineup_gameweek(lineup_df)
+        if current_lineup_gw:
+            score_col = f'GW {current_lineup_gw} Score'
+            if score_col in lineup_df.columns:
+                scorers_df = lineup_df[lineup_df[score_col].notna()].copy()
+                # Determine role and captain from Multiplier (0=bench, 1=starter, 2=captain)
+                scorers_df['Role'] = scorers_df['Multiplier'].map({0: 'Bench', 1: 'Starter', 2: 'Starter'})
+                scorers_df['Captain'] = scorers_df['Multiplier'].apply(lambda x: 'Captain' if x == 2 else '')
+                # Apply captain multiplier to score
+                scorers_df['Effective Score'] = scorers_df[score_col] * scorers_df['Multiplier'].apply(lambda x: 2 if x == 2 else 1)
+                # Group by Player + Position + Captain + Role
+                player_stats = scorers_df.groupby(['Player', 'Position Type', 'Captain', 'Role']).agg(
+                    Score=('Effective Score', 'first'),
+                    TeamList=('Team Name', lambda x: ', '.join(sorted(x.unique())))
+                ).reset_index()
+                player_stats = player_stats.sort_values('Score', ascending=False).head(20)
+                # Build headers
+                top_scorers_headers = '<th scope="col" class="text-center">Rank</th>'
+                top_scorers_headers += '<th scope="col" class="text-center">Player</th>'
+                top_scorers_headers += '<th scope="col" class="text-center">Position</th>'
+                top_scorers_headers += '<th scope="col" class="text-center">Score</th>'
+                top_scorers_headers += '<th scope="col" class="text-center">Teams</th>'
+                top_scorers_headers += '<th scope="col" class="text-center">Role</th>'
+                top_scorers_headers += '<th scope="col" class="text-center">Captain</th>'
+                # Build rows
+                top_scorers_rows = ""
+                for rank, (_, row) in enumerate(player_stats.iterrows(), 1):
+                    captain_display = '⭐ C' if row['Captain'] == 'Captain' else ''
+                    top_scorers_rows += f'<tr><td class="text-center">{rank}</td><td class="text-center">{row["Player"]}</td><td class="text-center">{row["Position Type"]}</td><td class="text-center">{int(row["Score"])}</td><td class="text-center">{row["TeamList"]}</td><td class="text-center">{row["Role"]}</td><td class="text-center">{captain_display}</td></tr>\n'
+
+    # Load Manager of the Month Schedule
+    try:
+        motm_schedule_df = pd.read_excel(ROOT / "data" / "motm_schedule.xlsx")
+        # Convert MoTM column to clean text (remove .0 decimals, keep NaN as empty)
+        if 'MoTM' in motm_schedule_df.columns:
+            motm_schedule_df['MoTM'] = motm_schedule_df['MoTM'].apply(
+                lambda x: str(int(x)) if pd.notna(x) and isinstance(x, float) and x == int(x) else ('None' if pd.isna(x) else str(x))
+            )
+
+        # Determine current MoTM row based on most_recent_week
+        def is_current_motm_row(row):
+            try:
+                first_gw = int(row['First Gameweek'].replace('GW ', ''))
+                last_gw = int(row['Last Gameweek'].replace('GW ', ''))
+                return first_gw <= most_recent_week <= last_gw
+            except (ValueError, AttributeError):
+                return False
+
+        motm_schedule_rows = ""
+        motm_schedule_headers = ""
+        for col in motm_schedule_df.columns:
+            motm_schedule_headers += f'<th scope="col" class="text-center">{col}</th>'
+        for _, row in motm_schedule_df.iterrows():
+            cells = ""
+            for col in motm_schedule_df.columns:
+                cells += f'<td class="text-center">{row[col]}</td>'
+            if is_current_motm_row(row):
+                motm_schedule_rows += f'<tr style="background-color: #d4edda;">{cells}</tr>\n'
+            else:
+                motm_schedule_rows += f'<tr>{cells}</tr>\n'
+    except FileNotFoundError:
+        motm_schedule_headers = "<th>No Data</th>"
+        motm_schedule_rows = "<tr><td>MoTM Schedule data not available</td></tr>"
+
     # Create column headers for table
     table_headers = ""
     for i, col in enumerate(display_cols):
@@ -1006,6 +1074,40 @@ def main():
                         {matchups_html}
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Top Scorers of the Week -->
+        <div class="content-card">
+            <h2 class="section-title">Top Scorers of the Week (GW {get_current_lineup_gameweek(lineup_df) or most_recent_week})</h2>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            {top_scorers_headers}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {top_scorers_rows}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Manager of the Month Schedule -->
+        <div class="content-card">
+            <h2 class="section-title">Manager of the Month Schedule</h2>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            {motm_schedule_headers}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {motm_schedule_rows}
+                    </tbody>
+                </table>
             </div>
         </div>
 

@@ -526,6 +526,69 @@ def main():
     else:
         matchups_html = "<p>No gameweek data available</p>"
 
+    # Build Top Scorers of the Week from lineup data
+    top_scorers_html = "<p>No lineup data available</p>"
+    if lineup_df is not None:
+        current_lineup_gw = get_current_lineup_gameweek(lineup_df)
+        if current_lineup_gw:
+            score_col = f'GW {current_lineup_gw} Score'
+            if score_col in lineup_df.columns:
+                scorers_df = lineup_df[lineup_df[score_col].notna()].copy()
+                # Determine role and captain from Multiplier (0=bench, 1=starter, 2=captain)
+                scorers_df['Role'] = scorers_df['Multiplier'].map({0: 'Bench', 1: 'Starter', 2: 'Starter'})
+                scorers_df['Captain'] = scorers_df['Multiplier'].apply(lambda x: 'Captain' if x == 2 else '')
+                # Apply captain multiplier to score
+                scorers_df['Effective Score'] = scorers_df[score_col] * scorers_df['Multiplier'].apply(lambda x: 2 if x == 2 else 1)
+                # Group by Player + Position + Captain + Role
+                player_stats = scorers_df.groupby(['Player', 'Position Type', 'Captain', 'Role']).agg(
+                    Score=('Effective Score', 'first'),
+                    TeamList=('Team Name', lambda x: ', '.join(sorted(x.unique())))
+                ).reset_index()
+                player_stats = player_stats.sort_values('Score', ascending=False).head(20)
+                # Build table
+                top_scorers_html = "<table class='motm-schedule-table' border='0'><thead><tr>"
+                top_scorers_html += "<th>Rank</th><th>Player</th><th>Position</th><th>Score</th><th>Teams</th><th>Role</th><th>Captain</th>"
+                top_scorers_html += "</tr></thead><tbody>"
+                for rank, (_, row) in enumerate(player_stats.iterrows(), 1):
+                    captain_display = '⭐ C' if row['Captain'] == 'Captain' else ''
+                    top_scorers_html += f"<tr><td>{rank}</td><td>{row['Player']}</td><td>{row['Position Type']}</td><td>{int(row['Score'])}</td><td>{row['TeamList']}</td><td>{row['Role']}</td><td>{captain_display}</td></tr>"
+                top_scorers_html += "</tbody></table>"
+
+    # Load Manager of the Month Schedule
+    try:
+        motm_schedule_df = pd.read_excel(ROOT / "data" / "motm_schedule.xlsx")
+        # Convert MoTM column to clean text (remove .0 decimals, keep NaN as empty)
+        if 'MoTM' in motm_schedule_df.columns:
+            motm_schedule_df['MoTM'] = motm_schedule_df['MoTM'].apply(
+                lambda x: str(int(x)) if pd.notna(x) and isinstance(x, float) and x == int(x) else ('None' if pd.isna(x) else str(x))
+            )
+
+        # Determine current MoTM row based on most_recent_week
+        def is_current_motm_row(row):
+            try:
+                first_gw = int(row['First Gameweek'].replace('GW ', ''))
+                last_gw = int(row['Last Gameweek'].replace('GW ', ''))
+                return first_gw <= most_recent_week <= last_gw
+            except (ValueError, AttributeError):
+                return False
+
+        # Build table HTML manually to support row highlighting
+        motm_schedule_table_html = "<table class='motm-schedule-table' border='0'><thead><tr>"
+        for col in motm_schedule_df.columns:
+            motm_schedule_table_html += f"<th>{col}</th>"
+        motm_schedule_table_html += "</tr></thead><tbody>"
+        for _, row in motm_schedule_df.iterrows():
+            if is_current_motm_row(row):
+                motm_schedule_table_html += "<tr class='current-motm'>"
+            else:
+                motm_schedule_table_html += "<tr>"
+            for col in motm_schedule_df.columns:
+                motm_schedule_table_html += f"<td>{row[col]}</td>"
+            motm_schedule_table_html += "</tr>"
+        motm_schedule_table_html += "</tbody></table>"
+    except FileNotFoundError:
+        motm_schedule_table_html = "<p>MoTM Schedule data not available</p>"
+
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -662,6 +725,15 @@ def main():
     .dataframe th:nth-child(3), .dataframe td:nth-child(3) {{
       width: 8%;
       text-align: center;
+    }}
+    
+    /* MoTM Schedule table styling */
+    .motm-schedule-table th, .motm-schedule-table td {{
+      text-align: center;
+    }}
+    tr.current-motm td {{
+      background: #d4edda !important;
+      font-weight: bold;
     }}
     
     /* Form table styling - Team Name is 3rd column */
@@ -983,6 +1055,16 @@ def main():
   <div class="card">
     <h2 class="large-title">GW {most_recent_week} Matchups</h2>
     {matchups_html}
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Top Scorers of the Week (GW {get_current_lineup_gameweek(lineup_df) or most_recent_week})</h2>
+    {top_scorers_html}
+  </div>
+
+  <div class="card">
+    <h2 class="large-title">Manager of the Month Schedule</h2>
+    {motm_schedule_table_html}
   </div>
 
   <div class="muted">
