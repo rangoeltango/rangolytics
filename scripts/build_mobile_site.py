@@ -179,13 +179,13 @@ def main():
     league_leader = df.loc[df['Rank'] == 1, 'Team Name'].iloc[0]
     
     # Last MoTM Champion
-    last_motm_champ = "Gabi-Gabi-Gabagool"
+    last_motm_champ = "Momoney"
     
-    # Current MoTM Leader (MoTM 7 - highest points, then highest score for ties)
+    # Current MoTM Leader (MoTM 8 - highest points, then highest score for ties)
     current_motm = "TBD"
-    if 'MoTM 7 Points' in df.columns and 'MoTM 7 Score' in df.columns:
-        # Sort by MoTM 7 Points (descending), then by MoTM 7 Score (descending) for tiebreaker
-        motm_sorted = df.sort_values(['MoTM 7 Points', 'MoTM 7 Score'], ascending=[False, False])
+    if 'MoTM 8 Points' in df.columns and 'MoTM 8 Score' in df.columns:
+        # Sort by MoTM 8 Points (descending), then by MoTM 8 Score (descending) for tiebreaker
+        motm_sorted = df.sort_values(['MoTM 8 Points', 'MoTM 8 Score'], ascending=[False, False])
         current_motm = motm_sorted.iloc[0]['Team Name']
     
     # Find most recent week with data first (moved up from later in code)
@@ -199,45 +199,29 @@ def main():
     display_cols = ["Rank", "Playoff", "Team Name", "Total Score", "Total Points", "W", "D", "L", "Total FFPts"]
     display_cols = [c for c in display_cols if c in df.columns]
     
-    # Create MoTM standings data - use dynamic week calculation
-    current_week = most_recent_week if most_recent_week > 0 else 23
-    next_week = current_week + 1
-    prev_week_1 = max(1, current_week - 1)
-    prev_week_2 = max(1, current_week - 2)
-    
-    # Check if we have results for current week or just opponents
-    current_result_col = f'Wk {current_week} Result'
-    current_opponent_col = f'Wk {current_week} Opponent Team'
-    next_opponent_col = f'Wk {next_week} Opponent Team'
-    
-    # Use results if available, otherwise use opponents
-    if current_result_col in df.columns:
-        week_col = current_result_col
-    else:
-        week_col = current_opponent_col
-        
-    motm_cols = ["Team Name", "MoTM 7 Points", "MoTM 7 Score", "MoTM 7 Score Behind", "MoTM 7 Behind", 
-                 f"Wk {prev_week_2} Result", f"Wk {prev_week_1} Result", week_col, next_opponent_col]
+    # Create MoTM standings data with fixed columns for MoTM 8
+    motm_cols = ["Team Name", "MoTM 8 Points", "MoTM 8 Score", "MoTM 8 Score Behind", "MoTM 8 Behind", 
+                 "Wk 25 Result", "Wk 26 Opponent Team", "Wk 27 Opponent Team", "Wk 28 Opponent Team"]
     available_motm_cols = [col for col in motm_cols if col in df.columns]
     
-    # If MoTM 7 Score Behind doesn't exist but MoTM 7 Score does, calculate it
-    if "MoTM 7 Score Behind" not in df.columns and "MoTM 7 Score" in df.columns:
-        max_score = df["MoTM 7 Score"].max()
-        df["MoTM 7 Score Behind"] = max_score - df["MoTM 7 Score"]
+    # If MoTM 8 Score Behind doesn't exist but MoTM 8 Score does, calculate it
+    if "MoTM 8 Score Behind" not in df.columns and "MoTM 8 Score" in df.columns:
+        max_score = df["MoTM 8 Score"].max()
+        df["MoTM 8 Score Behind"] = max_score - df["MoTM 8 Score"]
         # Update available columns list
         available_motm_cols = [col for col in motm_cols if col in df.columns]
     
     if len(available_motm_cols) > 2:  # At least Team Name and one other column
-        # Sort by MoTM 7 Points (high to low), then by MoTM 7 Score (high to low) for tiebreaking
+        # Sort by MoTM 8 Points (high to low), then by MoTM 8 Score (high to low) for tiebreaking
         sort_cols = []
         sort_ascending = []
         
-        if "MoTM 7 Points" in df.columns:
-            sort_cols.append("MoTM 7 Points")
+        if "MoTM 8 Points" in df.columns:
+            sort_cols.append("MoTM 8 Points")
             sort_ascending.append(False)  # High to low
             
-        if "MoTM 7 Score" in df.columns:
-            sort_cols.append("MoTM 7 Score")
+        if "MoTM 8 Score" in df.columns:
+            sort_cols.append("MoTM 8 Score")
             sort_ascending.append(False)  # High to low
             
         if sort_cols:
@@ -245,9 +229,9 @@ def main():
         else:
             motm_df = df[available_motm_cols].sort_values(available_motm_cols[1], ascending=False)
         
-        # Determine highest and second highest MoTM 7 Points values for flagging
-        if "MoTM 7 Points" in motm_df.columns:
-            unique_points = sorted(motm_df["MoTM 7 Points"].unique(), reverse=True)
+        # Determine highest and second highest MoTM 8 Points values for flagging
+        if "MoTM 8 Points" in motm_df.columns:
+            unique_points = sorted(motm_df["MoTM 8 Points"].unique(), reverse=True)
             highest_points = unique_points[0] if len(unique_points) > 0 else None
             second_highest_points = unique_points[1] if len(unique_points) > 1 else None
         else:
@@ -261,7 +245,7 @@ def main():
             for i, (col, val) in enumerate(row.items()):
                 if i == 0:  # Team Name
                     cells += f'<td class="fw-semibold">{val}</td>'
-                elif col == "MoTM 7 Points":
+                elif col == "MoTM 8 Points":
                     # Add flags based on point values
                     if val == highest_points:
                         cells += f'<td class="text-center">🟢 {val}</td>'
